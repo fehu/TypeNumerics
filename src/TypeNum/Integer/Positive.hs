@@ -13,12 +13,27 @@
 
 {-# LANGUAGE Rank2Types #-}
 
-module TypeNum.Integer.Positive where
+module TypeNum.Integer.Positive
+--(
+--
+----  PosInt(..),
+--
+--  PosInt'(..)
+--, Positive, Positive'
+--, positive
+--
+--, Positive2Int, Positive2Int'
+--, Positive2Nat
+--
+--, pos2TInt, posIntValue
+--
+--)
+where
 
+import TypeNum
 import TypeNum.Integer
 
-import GHC.TypeLits
-import Data.Type.Equality
+import Data.Type.Bool
 
 -----------------------------------------------------------------------------
 
@@ -27,6 +42,8 @@ data PosInt = One | PosSucc PosInt
 data PosInt' (i :: PosInt) = PosInt'
 
 -----------------------------------------------------------------------------
+
+type family Positive2Nat (p :: PosInt) :: Nat
 
 type family Positive2Int (p :: PosInt) :: TInt where
     Positive2Int One         = Succ Zero
@@ -60,5 +77,68 @@ positive _ = PosInt'
 -----------------------------------------------------------------------------
 
 instance (TIntValue n, Positive2Int i ~ n) => Show (PosInt' i) where show = show . posIntValue
+
+
+instance TypesEq (a :: PosInt) (b :: PosInt) where
+    type a == b  = Positive2Nat a == Positive2Nat b
+instance TypesOrd (a :: PosInt) (b :: PosInt) where
+    type Cmp a b = Cmp (Positive2Nat a) (Positive2Nat b)
+
+instance TypesEq (a :: PosInt) (b :: Nat)  where
+    type a == b  = Positive2Nat a == b
+instance TypesOrd (a :: PosInt) (b :: Nat) where
+    type Cmp a b = Cmp (Positive2Nat a) b
+
+instance TypesEq (a :: PosInt) (b :: TInt) where
+    type a == b  = Positive2Int a == b
+instance TypesOrd (a :: PosInt) (b :: TInt) where
+    type Cmp a b = Cmp (Positive2Int a) b
+
+-----------------------------------------------------------------------------
+
+instance TypesNat (a :: PosInt) (b :: PosInt) (c :: PosInt) where
+    type a +  b = PositiveUnsafe (a  + b)
+    type a /- b = PositiveUnsafe (a /- b)
+    type a *  b = PositiveUnsafe (a  * b)
+
+
+instance TypesNat (a :: PosInt) (b :: PosInt) (c :: Nat) where
+    type a +  b = (Positive2Nat a +  Positive2Nat b :: Nat)
+    type a /- b = (Positive2Nat a /- Positive2Nat b :: Nat)
+    type a *  b = (Positive2Nat a *  Positive2Nat b :: Nat)
+
+instance TypesNat (a :: PosInt) (b :: Nat) (c :: Nat) where
+    type a +  b = (Positive2Nat a +  b :: Nat)
+    type a /- b = (Positive2Nat a /- b :: Nat)
+    type a *  b = (Positive2Nat a *  b :: Nat)
+
+
+
+instance TypesNat (a :: PosInt) (b :: PosInt) (c :: TInt) where
+    type a +  b = Positive2Int (a  + b)
+    type a /- b = Positive2Int (a /- b)
+    type a *  b = Positive2Int (a  * b)
+
+instance TypesNat (a :: PosInt) (b :: Nat) (c :: TInt) where
+    type a +  b = Positive2Int (a  + b)
+    type a /- b = Positive2Int (a /- b)
+    type a *  b = Positive2Int (a  * b)
+
+-----------------------------------------------------------------------------
+
+instance TypesIntegral (a :: PosInt) (b :: PosInt) (c :: Nat) where
+    type QuotRem a b = (QuotRem (Positive2Nat a) (Positive2Nat b) :: (Nat, Nat))
+    type DivMod  a b = (DivMod  (Positive2Nat a) (Positive2Nat b) :: (Nat, Nat))
+
+instance TypesIntegral (a :: PosInt) (b :: PosInt) (c :: TInt) where
+    type QuotRem a b = (QuotRem (Positive2Int a) (Positive2Int b) :: (TInt, TInt))
+    type DivMod  a b = (DivMod  (Positive2Int a) (Positive2Int b) :: (TInt, TInt))
+
+
+-----------------------------------------------------------------------------
+
+
+
+
 
 
