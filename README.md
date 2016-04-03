@@ -1,5 +1,12 @@
 # Type-level Numerics
 
+### Examples
+
+See tests: 
+* [Nat](test/TypeNum/TTest/Nat.hs)
+* [Int](test/TypeNum/TTest/Int.hs)
+
+
 ### Interfaces
 
 ##### TypesEq
