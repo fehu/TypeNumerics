@@ -29,15 +29,16 @@ module TypeNum.Rational(
 , IntValuesForRational
 , AsRational(..)
 
-, TRational
-, RatioOf
+--, TRational
+--, RatioOf
 
 , module TypeNum.Integer
 , module TypeNum.Integer.Positive
+, TypesRational(..)
 
 ) where
 
-
+import TypeNum
 import TypeNum.Integer
 import TypeNum.Integer.Positive
 
@@ -48,16 +49,11 @@ import Data.Type.Equality as Eq
 
 -----------------------------------------------------------------------------
 
-type Ratio' (num :: TInt) (den :: Nat) = ((den Eq.== 0) ~ False) => Rational' num (PositiveUnsafe den)
-
 data Rational' (num :: TInt) (den :: PosInt) = Rational' (Int' num) (PosInt' den)
 
------------------------------------------------------------------------------
+-- Another constructor for Rational'
 
-data TRational = TRational' TInt PosInt
-
-type family RatioOf (t :: TRational) :: * where
-    RatioOf (TRational' num den) = Rational' num den
+type Ratio' (num :: TInt) (den :: Nat) = ((den Eq.== 0) ~ False) => Rational' num (PositiveUnsafe den)
 
 -----------------------------------------------------------------------------
 
@@ -87,9 +83,6 @@ instance (TIntValue n, TIntValue d, Positive2Int d' ~ d) => Show (Rational' n d'
 
 -----------------------------------------------------------------------------
 
-type family Fst (p :: (TInt, PosInt)) :: TInt   where Fst '(x,y) = x
-type family Snd (p :: (TInt, PosInt)) :: PosInt where Snd '(x,y) = y
-
 type Uncurry (a :: TInt -> PosInt -> *) (p :: (TInt, PosInt)) = a (Fst p) (Snd p)
 
 
@@ -111,6 +104,13 @@ instance AsRational (Int' i) where type AsRational' (Int' i) = '(i, One)
 instance AsRational (Rational' n d) where type AsRational' (Rational' n d) = '(n, d)
                                           asRational = id
                                           asRational' = rational
+
+
+-----------------------------------------------------------------------------
+
+--instance
+
+
 
 
 -----------------------------------------------------------------------------
