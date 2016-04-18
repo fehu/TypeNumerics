@@ -107,7 +107,7 @@ class TypeSign (num :: n)
         type FromSign (s :: Sign) :: n
 
 class (TypeSign x, TypeSign y, TypeSign z) =>
-    TypesRest (x :: a) (y :: b) (z :: n) where
+    TypesSubtraction (x :: a) (y :: b) (z :: n) where
         type (-) (x :: a) (y :: b) :: n
 
 class (TypesNat x x x, TypesNat y y y, TypesNat z z z, TypesNat x y z) =>
@@ -118,7 +118,7 @@ class (TypesNat x x x, TypesNat y y y, TypesNat z z z, TypesNat x y z) =>
 -----------------------------------------------------------------------------
 
 type family Fst (p :: (a, b)) :: a where Fst '(a, b) = a
-type family Snd (p :: (a, b)) :: a where Snd '(a, b) = b
+type family Snd (p :: (a, b)) :: b where Snd '(a, b) = b
 
 
 instance TypesEq (a :: Ordering) (b :: Ordering) where type a == b = a Eq.== b
