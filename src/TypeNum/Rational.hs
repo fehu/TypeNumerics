@@ -32,6 +32,9 @@ module TypeNum.Rational(
 , TRational
 , RatioOf
 
+, module TypeNum.Integer
+, module TypeNum.Integer.Positive
+
 ) where
 
 
@@ -41,11 +44,11 @@ import TypeNum.Integer.Positive
 import GHC.TypeLits
 import GHC.Real
 
-import Data.Type.Equality
+import Data.Type.Equality as Eq
 
 -----------------------------------------------------------------------------
 
-type Ratio' (num :: TInt) (den :: Nat) = ((den == 0) ~ False) => Rational' num (PositiveUnsafe den)
+type Ratio' (num :: TInt) (den :: Nat) = ((den Eq.== 0) ~ False) => Rational' num (PositiveUnsafe den)
 
 data Rational' (num :: TInt) (den :: PosInt) = Rational' (Int' num) (PosInt' den)
 

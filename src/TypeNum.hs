@@ -12,7 +12,7 @@
 --
 
 
-{-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE PolyKinds, ConstraintKinds #-}
 
 module TypeNum  where
 
@@ -39,7 +39,7 @@ type family SameSign (a :: Sign) (b :: Sign) :: Bool where
 -----------------------------------------------------------------------------
 
 class TypesEq  (x :: a) (y :: b) where
-    -- | Types equalence.
+    -- | Types equality.
     type (==) (x :: a) (y :: b) :: Bool
 
 class (TypesEq x y) =>
@@ -57,6 +57,9 @@ class (TypesEq x y) =>
 
         type a <= b = a == b || a < b
         type a >= b = a == b || a > b
+
+type (===) a b = (a == b) ~ True
+type (/==) a b = (a == b) ~ False
 
 -- | Natural-like numbers operations.
 class ( TypesOrd x x, TypesOrd y y, TypesOrd z z

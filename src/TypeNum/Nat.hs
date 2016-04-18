@@ -17,6 +17,8 @@ module TypeNum.Nat (
   Nat
 , Nat'(Nat')
 
+, TypesEq(..), TypesOrd(..), TypesNat(..)
+
 ) where
 
 import TypeNum

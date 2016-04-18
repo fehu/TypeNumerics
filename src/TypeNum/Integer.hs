@@ -26,6 +26,7 @@ module TypeNum.Integer (
 , AbsNat
 
 , module TypeNum.Nat
+, TypesIntegral(..)
 
 ) where
 
