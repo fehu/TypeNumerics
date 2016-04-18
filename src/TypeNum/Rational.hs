@@ -29,8 +29,8 @@ module TypeNum.Rational(
 , IntValuesForRational
 , AsRational(..)
 
---, TRational
---, RatioOf
+, SomeRational(..)
+, RatioOf
 
 , module TypeNum.Integer
 , module TypeNum.Integer.Positive
@@ -54,6 +54,13 @@ data Rational' (num :: TInt) (den :: PosInt) = Rational' (Int' num) (PosInt' den
 -- Another constructor for Rational'
 
 type Ratio' (num :: TInt) (den :: Nat) = ((den Eq.== 0) ~ False) => Rational' num (PositiveUnsafe den)
+
+-----------------------------------------------------------------------------
+
+data SomeRational = SomeRational' TInt PosInt
+
+type family RatioOf (t :: SomeRational) where
+    RatioOf (SomeRational' num den) = Rational' num den
 
 -----------------------------------------------------------------------------
 
