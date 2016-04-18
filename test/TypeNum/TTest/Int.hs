@@ -21,7 +21,7 @@ import TypeNum.Integer
 
 intSpec = describe "TypeNum.Integer.TInt" $ do
 
-    describe "is comparable at type-level" $ do
+    describe "is comparable at type-level (TypesEq and TypesOrd)" $ do
 
         specify "==" $ correct (B::B (Pos 1 == Pos 1))
                     && correct (B::B (Pos 1 == 1))
@@ -66,23 +66,23 @@ intSpec = describe "TypeNum.Integer.TInt" $ do
 
                     && mistake (B::B (Pos 4 <= Neg 1))
 
-    describe "has natural number operations at type-level" $ do
+    describe "has natural number operations at type-level (TypesNat)" $ do
 
         it "provides type-level sum '(+)'" $
-            correct (B::B ((Pos 1 + Pos 1 :: TInt) == Pos 2))
-         && correct (B::B ((Pos 4 + Pos 5 :: TInt) == Pos 9))
-         && correct (B::B ((Neg 4 + Pos 5 :: TInt) == Pos 1))
-         && correct (B::B ((Neg 5 + Pos 5 :: TInt) == Pos 0))
+               correct (B::B ((Pos 1 + Pos 1 :: TInt) == Pos 2))
+            && correct (B::B ((Pos 4 + Pos 5 :: TInt) == Pos 9))
+            && correct (B::B ((Neg 4 + Pos 5 :: TInt) == Pos 1))
+            && correct (B::B ((Neg 5 + Pos 5 :: TInt) == Pos 0))
 
-         && correct (B::B ((Pos 4 + Pos 5 :: TInt) == (Pos 2 + Pos 7 :: TInt)))
-         && correct (B::B ((Neg 4 + Pos 5 :: TInt) == (Pos 5 + Neg 4 :: TInt)))
-         && correct (B::B ((Neg 5 + Pos 5 :: TInt) == (Pos 4 + Neg 4 :: TInt)))
+            && correct (B::B ((Pos 4 + Pos 5 :: TInt) == (Pos 2 + Pos 7 :: TInt)))
+            && correct (B::B ((Neg 4 + Pos 5 :: TInt) == (Pos 5 + Neg 4 :: TInt)))
+            && correct (B::B ((Neg 5 + Pos 5 :: TInt) == (Pos 4 + Neg 4 :: TInt)))
 
-         && mistake (B::B ((Neg 4 + Pos 5 :: TInt) == Pos 4))
-         && mistake (B::B ((Neg 5 + Pos 5 :: TInt) == Neg 1))
+            && mistake (B::B ((Neg 4 + Pos 5 :: TInt) == Pos 4))
+            && mistake (B::B ((Neg 5 + Pos 5 :: TInt) == Neg 1))
 
-         && mistake (B::B ((Pos 4 + Pos 5 :: TInt) == (Pos 2 + Pos 2 :: TInt)))
-         && mistake (B::B ((Neg 4 + Pos 5 :: TInt) == (Pos 5 + Pos 4 :: TInt)))
+            && mistake (B::B ((Pos 4 + Pos 5 :: TInt) == (Pos 2 + Pos 2 :: TInt)))
+            && mistake (B::B ((Neg 4 + Pos 5 :: TInt) == (Pos 5 + Pos 4 :: TInt)))
 
         it "provides type-level absolute difference '(/-)'" $
                correct (B::B ((Pos 1 /- Pos 3 :: TInt) == 2))
@@ -109,7 +109,7 @@ intSpec = describe "TypeNum.Integer.TInt" $ do
 
         it "provides type-level power '(^)'" $ pending
 
-    describe "has integral number operations at type-level" $ do
+    describe "has integral number operations at type-level (TypesIntegral)" $ do
 
         it "provides type-level integer division truncated toward zero 'Quot'" $
 
@@ -118,6 +118,17 @@ intSpec = describe "TypeNum.Integer.TInt" $ do
             && correct (B::B (((QuotRem (Pos 2) (Pos 1)) :: (TInt, TInt)) == ('(Pos 2, Zero))))
             && correct (B::B (((QuotRem (Pos 4) (Pos 3)) :: (TInt, TInt)) == ('(Pos 1, Pos 1))))
 
+        it "provides type-level integer division truncated toward negative infinity 'Div'" $
+            example pending
+
+    describe "has sign operations at type-level (TypeSign)" $ do
+        it "provides type-level sign"           $ example pending
+        it "provides type-level absolute value" $ example pending
+        it "provides type-level unary negation" $ example pending
+        it "provides type-level sign to number transformation" $ example pending
+
+    describe "has subtraction operation at type-level (TypesSubtraction)"
+        it "provides type-level subtraction (-)" $ example pending
 
 
 

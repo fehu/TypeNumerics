@@ -22,7 +22,7 @@ import TypeNum.Nat
 
 natSpec = describe "GHC.TypeLits.Nat" $ do
 
-    describe "is comparable at type-level" $ do
+    describe "is comparable at type-level (TypesEq and TypesOrd)" $ do
 
         specify "==" $ correct (B::B (( 1 :: Nat) == ( 1 :: Nat)))
                     && correct (B::B ((17 :: Nat) == (17 :: Nat)))
@@ -42,7 +42,7 @@ natSpec = describe "GHC.TypeLits.Nat" $ do
                     && correct (B::B ((2 :: Nat) <= (2 :: Nat)))
                     && mistake (B::B ((5 :: Nat) <= (0 :: Nat)))
 
-    describe "has natural number operations at type-level" $ do
+    describe "has natural number operations at type-level (TypesNat)" $ do
 
         it "provides type-level sum '(+)'" $
                correct (B::B ((1 + 2 :: Nat) == (2 + 1 :: Nat)))
@@ -61,7 +61,7 @@ natSpec = describe "GHC.TypeLits.Nat" $ do
             && correct (B::B ((3 * 3 :: Nat) == (9 :: Nat)))
             && mistake (B::B ((2 * 3 :: Nat) == (8 :: Nat)))
 
-    describe "has integral number operations at type-level" $ do
+    describe "has integral number operations at type-level (TypesIntegral)" $ do
 
         it "provides type-level integer division truncated toward zero 'Quot'" $ pending
 
@@ -69,6 +69,9 @@ natSpec = describe "GHC.TypeLits.Nat" $ do
 --            && correct (B::B (((QuotRem 1 2) :: (Nat, Nat)) == '(0, 1)))
 --            && correct (B::B (((QuotRem 2 1) :: (Nat, Nat)) == '(2, 0)))
 --            && correct (B::B (((Quot 4 3) :: Nat) == (1 :: Nat)))
+
+        it "provides type-level integer division truncated toward negative infinity 'Div'" $
+            example pending
 
 
 
