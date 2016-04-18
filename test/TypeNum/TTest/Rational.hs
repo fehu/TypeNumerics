@@ -39,7 +39,7 @@ rationalSpec = describe "TypeNum.Integer.Rational'" $ do
         it "provides type-level unary negation" $ example pending
         it "provides type-level sign to number transformation" $ example pending
 
-    describe "has subtraction operation at type-level (TypesSubtraction)"
+    describe "has subtraction operation at type-level (TypesSubtraction)" $
         it "provides type-level subtraction (-)" $ example pending
 
     describe "has rational number operations at type-level (TypesRational)" $

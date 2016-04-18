@@ -26,7 +26,7 @@ module TypeNum.Integer (
 , AbsNat
 
 , module TypeNum.Nat
-, TypesIntegral(..), TypeSign(..), TypesRest(..)
+, TypesIntegral(..), TypeSign(..), TypesSubtraction(..)
 
 ) where
 

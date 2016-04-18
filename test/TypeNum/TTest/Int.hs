@@ -127,7 +127,7 @@ intSpec = describe "TypeNum.Integer.TInt" $ do
         it "provides type-level unary negation" $ example pending
         it "provides type-level sign to number transformation" $ example pending
 
-    describe "has subtraction operation at type-level (TypesSubtraction)"
+    describe "has subtraction operation at type-level (TypesSubtraction)" $
         it "provides type-level subtraction (-)" $ example pending
 
 
