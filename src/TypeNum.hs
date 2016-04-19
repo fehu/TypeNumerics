@@ -20,6 +20,7 @@ import Data.Type.Bool
 import qualified Data.Type.Equality as Eq
 
 -----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 
 data Sign = SignPos | SignNeg | SignZero
 
@@ -37,10 +38,18 @@ type family SameSign (a :: Sign) (b :: Sign) :: Bool where
     SameSign a        b        = False
 
 -----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 
 class TypesEq  (x :: a) (y :: b) where
     -- | Types equality.
     type (==) (x :: a) (y :: b) :: Bool
+
+
+
+type (===) a b = (a == b) ~ True
+type (/==) a b = (a == b) ~ False
+
+-----------------------------------------------------------------------------
 
 class (TypesEq x y) =>
     TypesOrd (x :: a) (y :: b) where
@@ -58,8 +67,16 @@ class (TypesEq x y) =>
         type a <= b = a == b || a < b
         type a >= b = a == b || a > b
 
-type (===) a b = (a == b) ~ True
-type (/==) a b = (a == b) ~ False
+
+-----------------------------------------------------------------------------
+
+class TypeNumValue (x :: a) where
+    type NumValue x :: *
+    type NumContainer x :: a -> *
+    runtimeValue  :: (NumContainer x) x -> NumValue x
+
+
+-----------------------------------------------------------------------------
 
 -- | Natural-like numbers operations.
 class ( TypesOrd x x, TypesOrd y y, TypesOrd z z
@@ -71,6 +88,8 @@ class ( TypesOrd x x, TypesOrd y y, TypesOrd z z
         type (/-) (x :: a) (y :: b) :: n
         type (*) (x :: a) (y :: b) :: n
         type (^) (x :: a) (y :: b) :: n
+
+-----------------------------------------------------------------------------
 
 -- | Integral numbers, supporting integer division.
 class (TypesNat x x x, TypesNat y y y, TypesNat z z z, TypesNat x y z) =>
@@ -94,6 +113,8 @@ class (TypesNat x x x, TypesNat y y y, TypesNat z z z, TypesNat x y z) =>
         type Div  a b = Fst (DivMod a b)
         type Mod  a b = Snd (DivMod a b)
 
+-----------------------------------------------------------------------------
+
 -- | Signed numeric.
 class TypeSign (num :: n)
     where
@@ -106,9 +127,13 @@ class TypeSign (num :: n)
         -- | Corresponding 1, -1 or 0.
         type FromSign (s :: Sign) :: n
 
+-----------------------------------------------------------------------------
+
 class (TypeSign x, TypeSign y, TypeSign z) =>
     TypesSubtraction (x :: a) (y :: b) (z :: n) where
         type (-) (x :: a) (y :: b) :: n
+
+-----------------------------------------------------------------------------
 
 class (TypesNat x x x, TypesNat y y y, TypesNat z z z, TypesNat x y z) =>
     TypesRational (x :: a) (y :: b) (z :: n) where
@@ -116,15 +141,27 @@ class (TypesNat x x x, TypesNat y y y, TypesNat z z z, TypesNat x y z) =>
 
 
 -----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 
 type family Fst (p :: (a, b)) :: a where Fst '(a, b) = a
 type family Snd (p :: (a, b)) :: b where Snd '(a, b) = b
 
+-----------------------------------------------------------------------------
 
 instance TypesEq (a :: Ordering) (b :: Ordering) where type a == b = a Eq.== b
 instance TypesEq (a :: Sign)     (b :: Sign)     where type a == b = SameSign a b
 
-instance TypesEq (a :: (x,y)) (b :: (x,y)) where type a == b = (Fst a == Fst b) && (Snd a == Snd b)
+instance TypesEq (a :: (x,y)) (b :: (x,y)) where
+    type a == b = (Fst a == Fst b) && (Snd a == Snd b)
 
+-----------------------------------------------------------------------------
+
+type family Cmp2 (a :: (x,y)) (b :: (x,y)) :: Ordering where
+    Cmp2 '(x1, y1) '(x2, y2) = If (x1 == x2) (Cmp y1 y2) (Cmp x1 x2)
+
+instance TypesOrd (a :: (x,y)) (b :: (x,y)) where
+    type Cmp a b = Cmp2 a b
+
+-----------------------------------------------------------------------------
 
 
