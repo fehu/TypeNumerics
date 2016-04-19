@@ -12,25 +12,20 @@
 --
 
 {-# LANGUAGE Rank2Types
-           , MultiParamTypeClasses
-           , FlexibleInstances
-           , PolyKinds
            , ConstraintKinds
            , FlexibleContexts
        #-}
 
 module TypeNum.Rational(
 
-  Rational'(..), Ratio'
-, (:%), (:%:)
-, (%:)
-, rationalValue, rational
+  TRational(..)
+, Ratio'(..)
 
-, IntValuesForRational
+, RationalK, Rational', Rational''
+
+, numerator', denominator', KnownRatio
+
 , AsRational(..)
-
-, SomeRational(..)
-, RatioOf
 
 , module TypeNum.Integer
 , module TypeNum.Integer.Positive
@@ -42,82 +37,84 @@ import TypeNum
 import TypeNum.Integer
 import TypeNum.Integer.Positive
 
-import GHC.TypeLits
 import GHC.Real
 
-import Data.Type.Equality as Eq
+import Data.Type.Bool
 
 -----------------------------------------------------------------------------
 
-data Rational' (num :: TInt) (den :: PosInt) = Rational' (Int' num) (PosInt' den)
+-- | Promotable rational representation.
+data TRational = TRational' TInt PosInt
 
--- Another constructor for Rational'
+-- | 'TRational' type container.
+data Ratio' (r :: TRational) = Ratio'
 
-type Ratio' (num :: TInt) (den :: Nat) = ((den Eq.== 0) ~ False) => Rational' num (PositiveUnsafe den)
-
------------------------------------------------------------------------------
-
-data SomeRational = SomeRational' TInt PosInt
-
-type family RatioOf (t :: SomeRational) where
-    RatioOf (SomeRational' num den) = Rational' num den
-
------------------------------------------------------------------------------
-
-type family (:%:) (num :: TInt) (den :: Nat) where n :%: d = Rational' n (PositiveUnsafe d)
-
-type family (:%) (num :: TInt) (den :: Nat) where
-    n :% 0 = Nothing
-    n :% d = Just (n :%: d)
+-- | 'TRational' kind constructor.
+type family RationalK (num :: TInt) (den :: PosInt) where
+    RationalK n d = TRational' n d
 
 
+-- | TRational type constructor.
+type Rational' (num :: TInt) (den :: PosInt) = Ratio' (RationalK num den)
 
-(%:) :: Int' num -> PosInt' den -> Rational' num den
-n %: d = Rational' n d
-
-rationalValue :: (TIntValue n, TIntValue d, Positive2Int d' ~ d) => Rational' n d' -> Rational
-rationalValue (Rational' n d) = intValue n :% posIntValue d
-
-rational :: Rational' n d
-rational = Rational' Int' PosInt'
-
------------------------------------------------------------------------------
-
-instance (TIntValue n, TIntValue d, Positive2Int d' ~ d) => Show (Rational' n d')
-    where show (Rational' n d) = let d' = posIntValue d
-                                 in if d' == 1 then show n
-                                               else "(" ++ show n ++ "/" ++ show d' ++ ")"
-
------------------------------------------------------------------------------
-
-type Uncurry (a :: TInt -> PosInt -> *) (p :: (TInt, PosInt)) = a (Fst p) (Snd p)
-
-
-type IntValuesForRational a = (TIntValue (Fst a), TIntValue (Positive2Int (Snd a)))
+-- | Alternative TRational type constructor.
+type Rational'' (num :: TInt) (den :: Nat) = (den /== 0) => Rational' num (PositiveUnsafe den)
 
 
 -----------------------------------------------------------------------------
 
-class AsRational a where type AsRational' a :: (TInt, PosInt)
-                         asRational :: (IntValuesForRational (AsRational' a)) =>
-                                        a -> Uncurry Rational' (AsRational' a)
+instance TypesEq (TRational' n1 d1) (TRational' n2 d2) where
+    type (TRational' n1 d1) == (TRational' n2 d2) = n1 == n2 && d1 == d2
+
+instance TypesEq (TRational' n d) (i :: TInt) where
+    type (TRational' n d) == i = (QuotRem n d) == '(i, 0)
+
+
+instance TypesOrd (TRational' n1 d1) (TRational' n2 d2) where
+    type Cmp (TRational' n1 d1) (TRational' n2 d2) = Cmp (QuotRem n1 d1)
+                                                         (QuotRem n2 d2)
+
+instance TypesOrd (TRational' n d) (i :: TInt) where
+    type Cmp (TRational' n d) (i :: TInt) = Cmp (QuotRem n d) '(i,0)
+
+
+numerator' :: Ratio' (TRational' n d) -> Int' n
+numerator' _ = Int'
+
+denominator' :: Ratio' (TRational' n d) -> PosInt' d
+denominator' _ = PosInt'
+
+type KnownRatio n d = (TIntValue n, TIntValue (Positive2Int d))
+
+instance (KnownRatio n d) =>
+    TypeNumValue (TRational' n d) where type NumValue (TRational' n d) = Rational
+                                        type NumContainer (TRational' n d) = Ratio'
+                                        runtimeValue r = intValue (numerator' r)
+                                                      :% posIntValue (denominator' r)
+
+instance (TIntValue n) =>
+    Show (Ratio' (TRational' n One)) where show = show . numerator'
+
+instance (KnownRatio n d) =>
+    Show (Ratio' (TRational' n d)) where
+        show r = "{" ++ show (numerator' r) ++ "/" ++ show (denominator' r) ++ "}"
+
+-----------------------------------------------------------------------------
+
+class AsRational a where type AsRational' a :: TRational
+                         asRational  :: a -> Ratio' (AsRational' a)
                          asRational' :: a
 
+                         asRational _ = Ratio'
 
-instance AsRational (Int' i) where type AsRational' (Int' i) = '(i, One)
-                                   asRational i = i %: positive (Nat' :: Nat' 1)
-                                   asRational' = Int'
+instance AsRational (Int' i) where type AsRational' (Int' i) = TRational' i One
+                                   asRational'  = Int'
 
-instance AsRational (Rational' n d) where type AsRational' (Rational' n d) = '(n, d)
-                                          asRational = id
-                                          asRational' = rational
-
-
------------------------------------------------------------------------------
-
---instance
-
-
+instance AsRational (Ratio' r) where type AsRational' (Ratio' r) = r
+                                     asRational'  = Ratio'
 
 
 -----------------------------------------------------------------------------
+
+
+
