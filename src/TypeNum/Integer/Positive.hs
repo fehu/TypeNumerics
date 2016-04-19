@@ -11,7 +11,7 @@
 -- |
 --
 
-{-# LANGUAGE Rank2Types #-}
+{-# LANGUAGE Rank2Types, ConstraintKinds, FlexibleContexts #-}
 
 module TypeNum.Integer.Positive
 --(
@@ -56,7 +56,10 @@ type family Positive2Int' i where
 pos2TInt :: (Positive2Int i ~ j) => PosInt' i -> Int' j
 pos2TInt = const Int'
 
-posIntValue :: (TIntValue n, Positive2Int i ~ n) => PosInt' i -> Integer
+
+type PosIntValue i = (TIntValue (Positive2Int i))
+
+posIntValue :: (PosIntValue i) => PosInt' i -> Integer
 posIntValue = intValue . pos2TInt
 
 
@@ -76,7 +79,8 @@ positive _ = PosInt'
 
 -----------------------------------------------------------------------------
 
-instance (TIntValue n, Positive2Int i ~ n) => Show (PosInt' i) where show = show . posIntValue
+instance (TIntValue (Positive2Int p)) => Show (PosInt' p) where
+    show = show . posIntValue
 
 
 instance TypesEq (a :: PosInt) (b :: PosInt) where
@@ -93,6 +97,14 @@ instance TypesEq (a :: PosInt) (b :: TInt) where
     type a == b  = Positive2Int a == b
 instance TypesOrd (a :: PosInt) (b :: TInt) where
     type Cmp a b = Cmp (Positive2Int a) b
+
+
+-----------------------------------------------------------------------------
+
+instance (TIntValue (Positive2Int p)) =>
+    TypeNumValue (p :: PosInt) where type NumValue (p :: PosInt) = Integer
+                                     type NumContainer (p :: PosInt) = PosInt'
+                                     runtimeValue = posIntValue
 
 -----------------------------------------------------------------------------
 

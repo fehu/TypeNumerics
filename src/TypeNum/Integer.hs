@@ -27,6 +27,7 @@ module TypeNum.Integer (
 
 , module TypeNum.Nat
 , TypesIntegral(..), TypeSign(..), TypesSubtraction(..)
+, TypeNumValue(..)
 
 ) where
 
@@ -44,7 +45,7 @@ data TInt = Zero
           | Succ TInt
           | Prev TInt
 
-data Int' (i :: TInt) = Int'
+data (TIntValue i) => Int' (i :: TInt) = Int'
 
 -----------------------------------------------------------------------------
 
@@ -186,6 +187,13 @@ instance TypesOrd (a :: TInt) (b :: Nat)  where type Cmp a b = CmpInt a (Pos b)
 
 instance TypesEq  (a :: Nat) (b :: TInt)  where type a == b = Pos a == b
 instance TypesOrd (a :: Nat) (b :: TInt)  where type Cmp a b = CmpInt (Pos a) b
+
+-----------------------------------------------------------------------------
+
+instance (TIntValue a) =>
+    TypeNumValue (a :: TInt) where type NumValue (a :: TInt) = Integer
+                                   type NumContainer (a :: TInt) = Int'
+                                   runtimeValue = intValue
 
 -----------------------------------------------------------------------------
 

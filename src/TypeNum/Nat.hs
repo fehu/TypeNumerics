@@ -37,10 +37,17 @@ data Nat' (n :: Nat) = Nat'
 instance TypesEq  (a :: Nat) (b :: Nat) where type a == b  = a Eq.== b
 instance TypesOrd (a :: Nat) (b :: Nat) where type Cmp a b = CmpNat a b
 
+
+instance (TL.KnownNat a) =>
+    TypeNumValue (a :: Nat) where type NumValue (a :: Nat) = Integer
+                                  type NumContainer (a :: Nat) = Nat'
+                                  runtimeValue = TL.natVal
+
 instance TypesNat (a :: Nat) (b :: Nat) (c :: Nat) where
     type a +  b = a TL.+ b
     type a /- b = If (a > b) (a TL.- b) (b TL.- a)
     type a *  b = a TL.* b
+    type a ^  b = a TL.^ b
 
 --instance TypesIntegral (a :: Nat) (b :: Nat) (c :: Nat) where
 --    type QuotRem a b = QuotRemNat' a (Cmp a b) b 0
