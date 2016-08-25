@@ -14,6 +14,7 @@
 {-# LANGUAGE Rank2Types
            , ConstraintKinds
            , FlexibleContexts
+           , PolyKinds
        #-}
 
 module TypeNum.Rational(
@@ -25,7 +26,7 @@ module TypeNum.Rational(
 
 , numerator', denominator', KnownRatio
 
-, AsRational(..)
+, IsRational(..)
 
 , module TypeNum.Integer
 , module TypeNum.Integer.Positive
@@ -40,6 +41,7 @@ import TypeNum.Integer.Positive
 import GHC.Real
 
 import Data.Type.Bool
+import Data.Type.Equality
 
 -----------------------------------------------------------------------------
 
@@ -58,17 +60,18 @@ type family RationalK (num :: TInt) (den :: PosInt) where
 type Rational' (num :: TInt) (den :: PosInt) = Ratio' (RationalK num den)
 
 -- | Alternative TRational type constructor.
-type Rational'' (num :: TInt) (den :: Nat) = (den /== 0) => Rational' num (PositiveUnsafe den)
+type Rational'' (num :: TInt) (den :: Nat) = (den /~= 0) => Rational' num (PositiveUnsafe den)
 
 
 -----------------------------------------------------------------------------
 
 instance TypesEq (TRational' n1 d1) (TRational' n2 d2) where
-    type (TRational' n1 d1) == (TRational' n2 d2) = n1 == n2 && d1 == d2
+    type (TRational' n1 d1) ~~ (TRational' n2 d2) = n1 == n2 && d1 == d2
 
 instance TypesEq (TRational' n d) (i :: TInt) where
-    type (TRational' n d) == i = (QuotRem n d) == '(i, 0)
+    type (TRational' n d) ~~ i = (QuotRem n d) ~~ '(i, 0)
 
+type instance (a :: TRational) == b = a ~~ b
 
 instance TypesOrd (TRational' n1 d1) (TRational' n2 d2) where
     type Cmp (TRational' n1 d1) (TRational' n2 d2) = Cmp (QuotRem n1 d1)
@@ -101,20 +104,21 @@ instance (KnownRatio n d) =>
 
 -----------------------------------------------------------------------------
 
-class AsRational a where type AsRational' a :: TRational
-                         asRational  :: a -> Ratio' (AsRational' a)
-                         asRational' :: a
+class (TypeNumValue a) =>
+    IsRational (a :: x) where type AsRational a :: TRational
 
-                         asRational _ = Ratio'
 
-instance AsRational (Int' i) where type AsRational' (Int' i) = TRational' i One
-                                   asRational'  = Int'
-
-instance AsRational (Ratio' r) where type AsRational' (Ratio' r) = r
-                                     asRational'  = Ratio'
-
+--class (TypeNumValue a) =>
+--    AsRational (a :: x) where type AsRational' a :: TRational
+--                              asRational :: Ratio' (AsRational' a)
+--                              asRational = Ratio'
+--
+--instance (TypeNumValue i) =>
+--    AsRational (i :: TInt) where type AsRational' i = TRational' i One
+--
+--instance (KnownRatio n d) =>
+--    AsRational (TRational' n d) where type AsRational' (TRational' n d) = TRational' n d
 
 -----------------------------------------------------------------------------
-
 
 

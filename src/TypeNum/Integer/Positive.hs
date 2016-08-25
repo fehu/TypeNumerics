@@ -34,6 +34,7 @@ import TypeNum
 import TypeNum.Integer
 
 import Data.Type.Bool
+import Data.Type.Equality
 
 -----------------------------------------------------------------------------
 
@@ -84,17 +85,19 @@ instance (TIntValue (Positive2Int p)) => Show (PosInt' p) where
 
 
 instance TypesEq (a :: PosInt) (b :: PosInt) where
-    type a == b  = Positive2Nat a == Positive2Nat b
+    type a ~~ b  = Positive2Nat a == Positive2Nat b
 instance TypesOrd (a :: PosInt) (b :: PosInt) where
     type Cmp a b = Cmp (Positive2Nat a) (Positive2Nat b)
 
+type instance (a :: PosInt) == b = a ~~ b
+
 instance TypesEq (a :: PosInt) (b :: Nat)  where
-    type a == b  = Positive2Nat a == b
+    type a ~~ b  = Positive2Nat a == b
 instance TypesOrd (a :: PosInt) (b :: Nat) where
     type Cmp a b = Cmp (Positive2Nat a) b
 
 instance TypesEq (a :: PosInt) (b :: TInt) where
-    type a == b  = Positive2Int a == b
+    type a ~~ b  = Positive2Int a == b
 instance TypesOrd (a :: PosInt) (b :: TInt) where
     type Cmp a b = Cmp (Positive2Int a) b
 

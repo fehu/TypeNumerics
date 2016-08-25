@@ -17,7 +17,7 @@
 module TypeNum  where
 
 import Data.Type.Bool
-import qualified Data.Type.Equality as Eq
+import Data.Type.Equality
 
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
@@ -41,14 +41,15 @@ type family SameSign (a :: Sign) (b :: Sign) :: Bool where
 -----------------------------------------------------------------------------
 
 class TypesEq  (x :: a) (y :: b) where
-    -- | Types equality.
-    type (==) (x :: a) (y :: b) :: Bool
+    -- | Types equality, permitting types of different kinds.
+    type (~~) (x :: a) (y :: b) :: Bool
 
 
+type (=~=) a b = (a ~~ b) ~ True
+type (/~=) a b = (a ~~ b) ~ False
 
-type (===) a b = (a == b) ~ True
-type (/==) a b = (a == b) ~ False
 
+-----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
 
 class (TypesEq x y) =>
@@ -61,14 +62,14 @@ class (TypesEq x y) =>
         type (<=) (x :: a) (y :: b) :: Bool
         type (>=) (x :: a) (y :: b) :: Bool
 
-        type a < b = Cmp a b == LT
-        type a > b = Cmp a b == GT
+        type a < b = Cmp a b ~~ LT
+        type a > b = Cmp a b ~~ GT
 
-        type a <= b = a == b || a < b
-        type a >= b = a == b || a > b
+        type a <= b = a ~~ b || a < b
+        type a >= b = a ~~ b || a > b
 
 
------------------------------------------------------------------------------
+------------------------Sign-----------------------------------------------------
 
 class TypeNumValue (x :: a) where
     type NumValue x :: *
@@ -148,11 +149,14 @@ type family Snd (p :: (a, b)) :: b where Snd '(a, b) = b
 
 -----------------------------------------------------------------------------
 
-instance TypesEq (a :: Ordering) (b :: Ordering) where type a == b = a Eq.== b
-instance TypesEq (a :: Sign)     (b :: Sign)     where type a == b = SameSign a b
+instance TypesEq (a :: Ordering) (b :: Ordering) where type a ~~ b = a == b
+instance TypesEq (a :: Sign)     (b :: Sign)     where type a ~~ b = SameSign a b
 
 instance TypesEq (a :: (x,y)) (b :: (x,y)) where
-    type a == b = (Fst a == Fst b) && (Snd a == Snd b)
+    type a ~~ b = (Fst a == Fst b) && (Snd a == Snd b)
+
+
+type instance a == b = SameSign a b
 
 -----------------------------------------------------------------------------
 

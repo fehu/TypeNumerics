@@ -17,7 +17,11 @@ module TypeNum.Nat (
   Nat
 , Nat'(Nat')
 
+, NatSucc, NatPrev
+
 , TypesEq(..), TypesOrd(..), TypesNat(..)
+
+, module Data.Type.Equality
 
 ) where
 
@@ -27,14 +31,14 @@ import GHC.TypeLits (Nat, CmpNat)
 import qualified GHC.TypeLits as TL
 
 import Data.Type.Bool
-import qualified Data.Type.Equality as Eq
+import Data.Type.Equality
 
 
 -----------------------------------------------------------------------------
 
 data Nat' (n :: Nat) = Nat'
 
-instance TypesEq  (a :: Nat) (b :: Nat) where type a == b  = a Eq.== b
+instance TypesEq  (a :: Nat) (b :: Nat) where type a ~~ b  = a == b
 instance TypesOrd (a :: Nat) (b :: Nat) where type Cmp a b = CmpNat a b
 
 
@@ -53,6 +57,16 @@ instance TypesNat (a :: Nat) (b :: Nat) (c :: Nat) where
 --    type QuotRem a b = QuotRemNat' a (Cmp a b) b 0
 --    type DivMod  a b = QuotRemNat' a (Cmp a b) b 0
 
+
+-----------------------------------------------------------------------------
+
+type family NatSucc (n :: Nat) :: Nat where
+    NatSucc 0 = 1
+    NatSucc x = x + 1
+
+type family NatPrev (n :: Nat) :: Maybe Nat where
+    NatPrev 0 = Nothing
+    NatPrev n = Just (n - 1)
 
 -----------------------------------------------------------------------------
 
