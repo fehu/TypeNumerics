@@ -14,20 +14,15 @@
 {-# LANGUAGE Rank2Types, ConstraintKinds, FlexibleContexts #-}
 
 module TypeNum.Integer.Positive
---(
---
-----  PosInt(..),
---
---  PosInt'(..)
---, Positive, Positive'
---, positive
---
---, Positive2Int, Positive2Int'
---, Positive2Nat
---
---, pos2TInt, posIntValue
---
---)
+(
+
+  PosInt(..), PosInt'(..)
+, PosIntValue(..)
+
+, PosIntConvert(..)
+, Nat2PosInt(..)
+, Int2PosInt(..)
+)
 where
 
 import TypeNum
@@ -44,43 +39,53 @@ data PosInt' (i :: PosInt) = PosInt'
 
 -----------------------------------------------------------------------------
 
-type family Positive2Nat (p :: PosInt) :: Nat
+class PosIntValue (i :: PosInt) where posIntValue :: PosInt' i -> Integer
 
-type family Positive2Int (p :: PosInt) :: TInt where
-    Positive2Int One         = Succ Zero
-    Positive2Int (PosSucc i) = Succ (Positive2Int i)
-
-type family Positive2Int' i where
-    Positive2Int' (PosInt' i) = Int' (Positive2Int i)
+instance PosIntValue One where posIntValue _ = 1
+instance (PosIntValue i) => PosIntValue (PosSucc i) where posIntValue i = posIntValue (iPrev' i) + 1
 
 
-pos2TInt :: (Positive2Int i ~ j) => PosInt' i -> Int' j
-pos2TInt = const Int'
+type family PrevOf' i where PrevOf' (PosSucc i) = i
 
-
-type PosIntValue i = (TIntValue (Positive2Int i))
-
-posIntValue :: (PosIntValue i) => PosInt' i -> Integer
-posIntValue = intValue . pos2TInt
-
-
-type family PositiveUnsafe (n :: Nat) :: PosInt where
-    PositiveUnsafe 1 = One
-    PositiveUnsafe i = PosSucc (PositiveUnsafe (i-1))
-
-
-type family Positive (n :: Nat) :: Maybe PosInt where
-    Positive 0 = Nothing
-    Positive i = Just (PositiveUnsafe i)
-
-type Positive' (n :: Nat) = ((n == 0) ~ False) => PosInt' (PositiveUnsafe n)
-
-positive :: Nat' n -> Positive' n
-positive _ = PosInt'
+iPrev' :: PosInt' i -> PosInt' (PrevOf' i)
+iPrev' = const PosInt'
 
 -----------------------------------------------------------------------------
 
-instance (TIntValue (Positive2Int p)) => Show (PosInt' p) where
+class PosIntConvert (p :: PosInt) where
+    type Positive2Nat p :: Nat
+    type Positive2Int p :: TInt
+
+instance PosIntConvert One where
+    type Positive2Nat One = 1
+    type Positive2Int One = Succ Zero
+
+instance PosIntConvert (PosSucc p) where
+    type Positive2Nat (PosSucc p) = 1 + Positive2Nat p
+    type Positive2Int (PosSucc p) = Succ (Positive2Int p)
+
+
+class Nat2PosInt (n :: Nat)  where type Nat2Positive n :: PosInt
+class Int2PosInt (i :: TInt) where type Int2Positive i :: PosInt
+
+type family Nat2PosInt' (n :: Nat) :: PosInt where
+    Nat2PosInt' 1 = One
+    Nat2PosInt' n = PosSucc (Nat2PosInt' (n /- 1))
+
+type family Int2PosInt' (i :: TInt) :: PosInt where
+    Int2PosInt' (Succ Zero) = One
+    Int2PosInt' (Succ i) = PosSucc (Int2PosInt' i)
+
+instance ((n >= 1) ~ True) => Nat2PosInt n where
+    type Nat2Positive n = Nat2PosInt' n
+
+instance ((i >= 0) ~ True) => Int2PosInt i where
+    type Int2Positive n = Int2PosInt' n
+
+
+-----------------------------------------------------------------------------
+
+instance (PosIntValue p) => Show (PosInt' p) where
     show = show . posIntValue
 
 
@@ -101,10 +106,9 @@ instance TypesEq (a :: PosInt) (b :: TInt) where
 instance TypesOrd (a :: PosInt) (b :: TInt) where
     type Cmp a b = Cmp (Positive2Int a) b
 
-
 -----------------------------------------------------------------------------
 
-instance (TIntValue (Positive2Int p)) =>
+instance (PosIntValue p) =>
     TypeNumValue (p :: PosInt) where type NumValue (p :: PosInt) = Integer
                                      type NumContainer (p :: PosInt) = PosInt'
                                      runtimeValue = posIntValue
@@ -112,9 +116,9 @@ instance (TIntValue (Positive2Int p)) =>
 -----------------------------------------------------------------------------
 
 instance TypesNat (a :: PosInt) (b :: PosInt) (c :: PosInt) where
-    type a +  b = PositiveUnsafe (a  + b)
-    type a /- b = PositiveUnsafe (a /- b)
-    type a *  b = PositiveUnsafe (a  * b)
+    type a +  b = Nat2Positive (a  + b)
+    type a /- b = Nat2Positive (a /- b)
+    type a *  b = Nat2Positive (a  * b)
 
 
 instance TypesNat (a :: PosInt) (b :: PosInt) (c :: Nat) where
