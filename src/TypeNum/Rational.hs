@@ -23,6 +23,7 @@ module TypeNum.Rational(
 , Ratio'(..), (:%)
 
 , KnownRatio(..)
+, MayRational(..)
 
 , module TypeNum.Integer
 , module TypeNum.Integer.Positive
@@ -106,4 +107,24 @@ instance (KnownRatio r) =>
                                                          d -> "{" ++ num ++ "/" ++ den ++ "}"
 
 -----------------------------------------------------------------------------
+
+class MayRational (a :: k) where type AsRational a :: TRational
+                                 type MRationalC a :: k -> *
+                                 asRational :: (MRationalC a) a -> Ratio' (AsRational a)
+
+instance MayRational (r :: TRational) where type AsRational r = r
+                                            type MRationalC r = Ratio'
+                                            asRational = id
+
+instance MayRational (n :: Nat) where type AsRational n = Pos n :% 1
+                                      type MRationalC n = Nat'
+                                      asRational n = Ratio'
+
+instance MayRational (n :: TInt) where type AsRational n = n :% 1
+                                       type MRationalC n = Int'
+                                       asRational n = Ratio'
+
+
+-----------------------------------------------------------------------------
+
 

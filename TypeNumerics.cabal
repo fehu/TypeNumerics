@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                TypeNumerics
-version:             0.2.2.1
+version:             0.2.2.2
 -- synopsis:
 -- description:
 license:             MIT
@@ -65,5 +65,4 @@ executable example1
                         DataKinds
                         TypeFamilies
                         UndecidableInstances
-
 
