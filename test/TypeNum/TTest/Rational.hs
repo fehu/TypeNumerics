@@ -21,8 +21,17 @@ import TypeNum.Rational
 rationalSpec = describe "TypeNum.Integer.Rational'" $ do
 
     describe "is comparable at type-level (TypesEq and TypesOrd)" $ do
-        specify "==" $ example pending
-        specify ">"  $ example pending
+        specify "==" $ correct (B::B(Pos 4:%5 == Pos 4:%5))
+                    && correct (B::B(Pos 4:%4 ~~ Pos 1))
+                    && correct (B::B(Pos 2:%4 == Pos 1:%2))
+
+                    && correct (B::B(Rem (Pos 4) (Pos 5) == Pos 4))
+                    && correct (B::B(Rem (Pos 5) (Pos 4) == Pos 1))
+        specify ">"  $ correct (B::B((Pos 7:%5) > (Pos 4:%5)))
+                    && correct (B::B((Pos 1:%2) > (Pos 1:%3)))
+                    && mistake (B::B((Pos 1:%3) > (Pos 1:%2)))
+                    && correct (B::B((Pos 4:%5) > (Neg 7:%5)))
+
         specify "<"  $ example pending
         specify ">=" $ example pending
         specify "<=" $ example pending

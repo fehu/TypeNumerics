@@ -14,10 +14,25 @@
 
 {-# LANGUAGE PolyKinds, ConstraintKinds #-}
 
-module TypeNum  where
+module TypeNum (
+
+  Sign(..), SignsMult, SameSign
+
+, TypeNumValue(..)
+, TypesNat(..)
+, TypesIntegral(..)
+, TypeSign(..)
+, TypesSubtraction(..)
+, TypesRational(..)
+
+, module TypeNum.TypeFunctions
+
+) where
 
 import Data.Type.Bool
 import Data.Type.Equality
+
+import TypeNum.TypeFunctions
 
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
@@ -37,39 +52,10 @@ type family SameSign (a :: Sign) (b :: Sign) :: Bool where
     SameSign SignZero SignZero = True
     SameSign a        b        = False
 
------------------------------------------------------------------------------
------------------------------------------------------------------------------
-
-class TypesEq  (x :: a) (y :: b) where
-    -- | Types equality, permitting types of different kinds.
-    type (~~) (x :: a) (y :: b) :: Bool
-
-
-type (=~=) a b = (a ~~ b) ~ True
-type (/~=) a b = (a ~~ b) ~ False
-
 
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
 
-class (TypesEq x y) =>
-    TypesOrd (x :: a) (y :: b) where
-        -- | Types ordering.
-        type Cmp  (x :: a) (y :: b) :: Ordering
-
-        type (<)  (x :: a) (y :: b) :: Bool
-        type (>)  (x :: a) (y :: b) :: Bool
-        type (<=) (x :: a) (y :: b) :: Bool
-        type (>=) (x :: a) (y :: b) :: Bool
-
-        type a < b = Cmp a b ~~ LT
-        type a > b = Cmp a b ~~ GT
-
-        type a <= b = a ~~ b || a < b
-        type a >= b = a ~~ b || a > b
-
-
-------------------------Sign-----------------------------------------------------
 
 class TypeNumValue (x :: a) where
     type NumValue x :: *
@@ -144,28 +130,9 @@ class (TypesNat x x x, TypesNat y y y, TypesNat z z z, TypesNat x y z) =>
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
 
-type family Fst (p :: (a, b)) :: a where Fst '(a, b) = a
-type family Snd (p :: (a, b)) :: b where Snd '(a, b) = b
 
------------------------------------------------------------------------------
-
-instance TypesEq (a :: Ordering) (b :: Ordering) where type a ~~ b = a == b
 instance TypesEq (a :: Sign)     (b :: Sign)     where type a ~~ b = SameSign a b
-
-instance TypesEq (a :: (x,y)) (b :: (x,y)) where
-    type a ~~ b = (Fst a == Fst b) && (Snd a == Snd b)
-
-
 type instance a == b = SameSign a b
 
 -----------------------------------------------------------------------------
-
-type family Cmp2 (a :: (x,y)) (b :: (x,y)) :: Ordering where
-    Cmp2 '(x1, y1) '(x2, y2) = If (x1 == x2) (Cmp y1 y2) (Cmp x1 x2)
-
-instance TypesOrd (a :: (x,y)) (b :: (x,y)) where
-    type Cmp a b = Cmp2 a b
-
------------------------------------------------------------------------------
-
 

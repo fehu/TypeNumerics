@@ -59,16 +59,23 @@ type family (:%) (num :: TInt) (den :: Nat) :: TRational
 -----------------------------------------------------------------------------
 
 instance TypesEq (TRational' n1 d1) (TRational' n2 d2) where
-    type (TRational' n1 d1) ~~ (TRational' n2 d2) = n1 == n2 && d1 == d2
+    type (TRational' n1 d1) ~~ (TRational' n2 d2) =
+            Cmp (TRational' n1 d1) (TRational' n2 d2) == EQ
 
 instance TypesEq (TRational' n d) (i :: TInt) where
-    type (TRational' n d) ~~ i = (QuotRem n d) ~~ '(i, 0)
+    type (TRational' n d) ~~ i = (QuotRem n (Positive2Int d)) == '(i, Zero)
 
 type instance (a :: TRational) == b = a ~~ b
 
 instance TypesOrd (TRational' n1 d1) (TRational' n2 d2) where
-    type Cmp (TRational' n1 d1) (TRational' n2 d2) = Cmp (QuotRem n1 d1)
-                                                         (QuotRem n2 d2)
+    type Cmp (TRational' n1 d1) (TRational' n2 d2) =
+        CmpFunc :$: Seconds '(QuotRem n1 (Positive2Int d1), QuotRem n2 (Positive2Int d2) )
+                             (XMultiply d1 d2)
+
+
+data XMultiply (d1 :: PosInt) (d2 :: PosInt) (m :: (TInt,TInt)) (r :: (TInt,TInt))
+type instance (XMultiply d1 d2) :$: '(n1,n2) = '(n1*(Positive2Int d2), n2*(Positive2Int d1))
+
 
 instance TypesOrd (TRational' n d) (i :: TInt) where
     type Cmp (TRational' n d) (i :: TInt) = Cmp (QuotRem n d) '(i,0)

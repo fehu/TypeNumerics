@@ -18,6 +18,7 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     TypeNum
+                       TypeNum.TypeFunctions
                        TypeNum.Nat
                        TypeNum.Integer
                        TypeNum.Integer.Positive
