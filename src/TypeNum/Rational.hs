@@ -63,7 +63,7 @@ instance TypesEq (TRational' n1 d1) (TRational' n2 d2) where
             Cmp (TRational' n1 d1) (TRational' n2 d2) == EQ
 
 instance TypesEq (TRational' n d) (i :: TInt) where
-    type (TRational' n d) ~~ i = (QuotRem n (Positive2Int d)) == '(i, Zero)
+    type (TRational' n d) ~~ i = QuotRem n (Positive2Int d) == '(i, Zero)
 
 type instance (a :: TRational) == b = a ~~ b
 
@@ -133,5 +133,12 @@ instance MayRational (n :: TInt) where type AsRational n = n :% 1
 
 
 -----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+
+instance TypesNat (TRational' n1 d1) (TRational' n2 d2) (TRational' n3 d3) where
+    type (TRational' n1 d1) + (TRational' n2 d2) = TRational' (  (n1* Positive2Int d1 :: TInt)
+                                                               + (n2* Positive2Int d2 :: TInt)
+                                                              )
+                                                              (d1*d2)
 
 

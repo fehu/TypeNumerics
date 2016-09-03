@@ -37,7 +37,12 @@ rationalSpec = describe "TypeNum.Integer.Rational'" $ do
         specify "<=" $ example pending
 
     describe "has natural number operations at type-level (TypesNat)" $ do
-        it "provides type-level sum '(+)'"                  $ example pending
+        it "provides type-level sum '(+)'"
+              $ correct (B::B(  (Pos 3:%7) + (Pos 4:%7) == (Pos 7:%7) ))
+             && correct (B::B(  ((Pos 3:%7) + (Pos 4:%7) :: TRational) ~~ Pos 1 ))
+             && correct (B::B(  (Pos 1:%3) + (Pos 1:%2) == (Pos 5:%6) ))
+
+
         it "provides type-level absolute difference '(/-)'" $ example pending
         it "provides type-level multiplication '(*)'"       $ example pending
         it "provides type-level power '(^)'"                $ example pending
