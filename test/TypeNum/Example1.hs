@@ -26,6 +26,7 @@ class I a where implicitly :: a
 data A = A deriving Show
 instance I A where implicitly = A
 
+main = undefined
 
 -----------------------------------------------------------------------------
 

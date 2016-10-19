@@ -26,7 +26,7 @@ module TypeNum.Integer (
 , AbsNat
 
 , module TypeNum.Nat
-, TypesIntegral(..), TypeSign(..), TypesSubtraction(..)
+, TypeIntegral(..), TypeSign(..), TypeSubtraction(..)
 , TypeNumValue(..)
 
 ) where
@@ -77,6 +77,8 @@ instance (TIntValue i) => TIntValue (Prev i) where intValue i = intValue (iSucc 
 instance (TIntValue i) => Show (Int' i) where show = show . intValue
 
 -----------------------------------------------------------------------------
+
+--instance
 
 type family Pos (n :: Nat) :: TInt where
     Pos 0 = Zero
@@ -215,13 +217,13 @@ type family WithSign' (a :: TInt) (b :: TInt) (n :: (Nat, Nat)) :: (TInt, TInt) 
                                                                            '(Pos x, Pos y)
 
 
-instance TypesNat (a :: TInt) (b :: TInt) (c :: TInt) where
+instance TypeNat (a :: TInt) b where
     type a +  b = IntPlus a b
-    type a /- b = IntDiff a b
     type a *  b = WithSign a b (IntMult' a b)
 
+instance TypeAbsDiff (a :: TInt) b where type a /- b = IntDiff a b
 
-instance TypesIntegral (a :: TInt) (b :: TInt) (c :: TInt) where
+instance TypeIntegral (a :: TInt) b where
     type QuotRem a b = QuotRemInt a b -- WithSign' a b (QuotRem (AbsNat a) (AbsNat b))
     type DivMod  a b = WithSign' a b (DivMod  (AbsNat a) (AbsNat b))
 

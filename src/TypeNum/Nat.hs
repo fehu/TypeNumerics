@@ -19,7 +19,7 @@ module TypeNum.Nat (
 
 , NatSucc, NatPrev
 
-, TypesEq(..), TypesOrd(..), TypesNat(..)
+, TypesEq(..), TypesOrd(..), TypeNat(..)
 
 , module Data.Type.Equality
 
@@ -47,11 +47,13 @@ instance (TL.KnownNat a) =>
                                   type NumContainer (a :: Nat) = Nat'
                                   runtimeValue = TL.natVal
 
-instance TypesNat (a :: Nat) (b :: Nat) (c :: Nat) where
+instance TypeNat (a :: Nat) b where
     type a +  b = a TL.+ b
-    type a /- b = If (a > b) (a TL.- b) (b TL.- a)
     type a *  b = a TL.* b
     type a ^  b = a TL.^ b
+
+instance TypeAbsDiff (a :: Nat) (b :: Nat) where
+    type a /- b = If (a > b) (a TL.- b) (b TL.- a)
 
 --instance TypesIntegral (a :: Nat) (b :: Nat) (c :: Nat) where
 --    type QuotRem a b = QuotRemNat' a (Cmp a b) b 0

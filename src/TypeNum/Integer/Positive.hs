@@ -115,49 +115,30 @@ instance (PosIntValue p) =>
 
 -----------------------------------------------------------------------------
 
-instance TypesNat (a :: PosInt) (b :: PosInt) (c :: PosInt) where
-    type a +  b = Nat2Positive (a  + b)
-    type a /- b = Nat2Positive (a /- b)
-    type a *  b = Nat2Positive (a  * b)
+instance TypeNat (a :: PosInt) b where
+    type a +  b = PosPlus a b
+--    type a /- b = Nat2Positive (a /- b)
+--    type a *  b = Nat2Positive (a  * b)
 
 
-instance TypesNat (a :: PosInt) (b :: PosInt) (c :: Nat) where
-    type a +  b = (Positive2Nat a +  Positive2Nat b :: Nat)
-    type a /- b = (Positive2Nat a /- Positive2Nat b :: Nat)
-    type a *  b = (Positive2Nat a *  Positive2Nat b :: Nat)
+type family PosPlus a b where
+    PosPlus One x = PosSucc x
+    PosPlus x One = PosSucc x
+    PosPlus (PosSucc y) x = PosPlus y (PosSucc x)
 
-instance TypesNat (a :: PosInt) (b :: Nat) (c :: Nat) where
-    type a +  b = (Positive2Nat a +  b :: Nat)
-    type a /- b = (Positive2Nat a /- b :: Nat)
-    type a *  b = (Positive2Nat a *  b :: Nat)
-
-
-
-instance TypesNat (a :: PosInt) (b :: PosInt) (c :: TInt) where
-    type a +  b = Positive2Int (a  + b)
-    type a /- b = Positive2Int (a /- b)
-    type a *  b = Positive2Int (a  * b)
-
-instance TypesNat (a :: PosInt) (b :: Nat) (c :: TInt) where
-    type a +  b = Positive2Int (a  + b)
-    type a /- b = Positive2Int (a /- b)
-    type a *  b = Positive2Int (a  * b)
+--type family PosDiff a b where
+--    PosDiff
 
 -----------------------------------------------------------------------------
 
-instance TypesIntegral (a :: PosInt) (b :: PosInt) (c :: Nat) where
-    type QuotRem a b = (QuotRem (Positive2Nat a) (Positive2Nat b) :: (Nat, Nat))
-    type DivMod  a b = (DivMod  (Positive2Nat a) (Positive2Nat b) :: (Nat, Nat))
-
-instance TypesIntegral (a :: PosInt) (b :: PosInt) (c :: TInt) where
-    type QuotRem a b = (QuotRem (Positive2Int a) (Positive2Int b) :: (TInt, TInt))
-    type DivMod  a b = (DivMod  (Positive2Int a) (Positive2Int b) :: (TInt, TInt))
-
+--instance TypeIntegral (a :: PosInt) b where
+--    type QuotRem a b = (QuotRem (Positive2Nat a) (Positive2Nat b) :: (PosInt, PosInt))
+--    type DivMod  a b = (DivMod  (Positive2Nat a) (Positive2Nat b) :: (PosInt, PosInt))
 
 -----------------------------------------------------------------------------
 
 
-
+--instance Convertible (x :: PosInt) (y :: TInt) where type Convert x = Positive2Int x
 
 
 

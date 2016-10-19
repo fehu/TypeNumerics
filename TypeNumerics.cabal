@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                TypeNumerics
-version:             0.2.2.2
+version:             0.2.3.0
 -- synopsis:
 -- description:
 license:             MIT
@@ -22,7 +22,7 @@ library
                        TypeNum.Nat
                        TypeNum.Integer
                        TypeNum.Integer.Positive
-                       TypeNum.Rational
+--                       TypeNum.Rational
 
   build-depends:       base >=4.8 && <4.9
   default-language:    Haskell2010
@@ -46,7 +46,7 @@ test-suite type-tests
 
                        TypeNum.TTest.Nat
                        TypeNum.TTest.Int
-                       TypeNum.TTest.Rational
+--                       TypeNum.TTest.Rational
 
   default-language:    Haskell2010
   default-extensions:   TypeOperators
@@ -54,16 +54,16 @@ test-suite type-tests
                         TypeFamilies
                         UndecidableInstances
 
-executable example1
-  main-is:test/TypeNum/Example1.hs
-
-  build-depends:       TypeNumerics
-                     , base >=4.8 && <4.9
-                     , hspec >= 2.2 && < 2.3
-
-  default-language:    Haskell2010
-  default-extensions:   TypeOperators
-                        DataKinds
-                        TypeFamilies
-                        UndecidableInstances
+--executable example1
+--  main-is:test/TypeNum/Example1.hs
+--
+--  build-depends:       TypeNumerics
+--                     , base >=4.8 && <4.9
+--                     , hspec >= 2.2 && < 2.3
+--
+--  default-language:    Haskell2010
+--  default-extensions:   TypeOperators
+--                        DataKinds
+--                        TypeFamilies
+--                        UndecidableInstances
 

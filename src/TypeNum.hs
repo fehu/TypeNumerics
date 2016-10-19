@@ -19,11 +19,17 @@ module TypeNum (
   Sign(..), SignsMult, SameSign
 
 , TypeNumValue(..)
-, TypesNat(..)
-, TypesIntegral(..)
+--, HasZero(..), IsZero(..), IsZeroFunc, NotZero(..), NotZeroFunc
+--, HasOne(..), IsOne(..), IsOneFunc, NotOne(..), NotOneFunc
+
+, TypeNat(..)
+, TypeIntegral(..)
+, TypeAbsDiff(..)
 , TypeSign(..)
-, TypesSubtraction(..)
-, TypesRational(..)
+, TypeSubtraction(..)
+, TypeRational(..)
+
+--, Convertible(..)
 
 , module TypeNum.TypeFunctions
 
@@ -62,38 +68,65 @@ class TypeNumValue (x :: a) where
     type NumContainer x :: a -> *
     runtimeValue  :: (NumContainer x) x -> NumValue x
 
+-----------------------------------------------------------------------------
+
+--class HasZero (x :: a) where type GetZero x :: a
+--
+--type family IsZero x where IsZero x = x == GetZero x
+--data IsZeroFunc x (b :: Bool)
+--type instance IsZeroFunc :$: x = IsZero x
+--
+--type family NotZero x where NotZero x = Not (IsZero x)
+--data NotZeroFunc x (b :: Bool)
+--type instance NotZeroFunc :$: x = NotZero x
+
+-----------------------------------------------------------------------------
+
+--class HasOne (x :: a) where type GetOne x :: a
+--
+--type family IsOne x where IsOne x = x == GetOne x
+--data IsOneFunc x (b :: Bool)
+--type instance IsOneFunc :$: x = IsOne x
+--
+--type family NotOne x where NotOne x = Not (IsOne x)
+--data NotOneFunc x (b :: Bool)
+--type instance NotOneFunc :$: x = NotOne x
+
 
 -----------------------------------------------------------------------------
 
 -- | Natural-like numbers operations.
-class ( TypesOrd x x, TypesOrd y y, TypesOrd z z
-      , TypesOrd x y, TypesOrd x z, TypesOrd y z )
-  =>
-    TypesNat (x :: a) (y :: b) (z :: n) where
-        type (+) (x :: a) (y :: b) :: n
+class (TypesOrd x y, TypesOrd x x, TypesOrd y y) =>
+    TypeNat (x :: n) (y :: n) where
+        type (+) x y :: n
+        type (*)  x y :: n
+        type (^)  x y :: n
+
+
+-----------------------------------------------------------------------------
+
+class (TypeNat x y) => TypeAbsDiff (x :: a) (y :: a) where
         -- | Absolute difference.
-        type (/-) (x :: a) (y :: b) :: n
-        type (*) (x :: a) (y :: b) :: n
-        type (^) (x :: a) (y :: b) :: n
+        type (/-) x y :: n
 
 -----------------------------------------------------------------------------
 
 -- | Integral numbers, supporting integer division.
-class (TypesNat x x x, TypesNat y y y, TypesNat z z z, TypesNat x y z) =>
-    TypesIntegral (x :: a) (y :: b) (z :: n) where
+class (TypeNat x y) =>
+    TypeIntegral (x :: n) (y :: n) where
         -- | Integer division truncated toward zero.
-        type Quot (x :: a) (y :: b) :: n
+        type Quot x y :: n
         -- | Integer remainder.
-        type Rem  (x :: a) (y :: b) :: n
+        type Rem x y :: n
         -- | Simultaneous 'Quot' and 'Rem'.
-        type QuotRem (x :: a) (y :: b) :: (n, n)
+        type QuotRem x y :: (n, n)
 
         -- | Integer division truncated toward negative infinity.
-        type Div  (x :: a) (y :: b) :: n
+        type Div x y :: n
         -- | Integer modulus.
-        type Mod  (x :: a) (y :: b) :: n
+        type Mod x y :: n
         -- | Simultaneous 'Div' and 'Mod'.
-        type DivMod (x :: a) (y :: b) :: (n, n)
+        type DivMod x y :: (n, n)
 
         type Quot a b = Fst (QuotRem a b)
         type Rem  a b = Snd (QuotRem a b)
@@ -116,23 +149,25 @@ class TypeSign (num :: n)
 
 -----------------------------------------------------------------------------
 
-class (TypeSign x, TypeSign y, TypeSign z) =>
-    TypesSubtraction (x :: a) (y :: b) (z :: n) where
-        type (-) (x :: a) (y :: b) :: n
+class (TypeSign x, TypeSign y) =>
+    TypeSubtraction (x :: n) (y :: n) where type (-) x y :: n
 
 -----------------------------------------------------------------------------
 
-class (TypesNat x x x, TypesNat y y y, TypesNat z z z, TypesNat x y z) =>
-    TypesRational (x :: a) (y :: b) (z :: n) where
-        type (/) (x :: a) (y :: b) :: n
+class (TypeNat x y) =>
+    TypeRational (x :: n) (y :: n)    where type (/) x y :: n
 
 
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
 
 
-instance TypesEq (a :: Sign)     (b :: Sign)     where type a ~~ b = SameSign a b
+instance TypesEq (a :: Sign) (b :: Sign) where type a ~~ b = SameSign a b
 type instance a == b = SameSign a b
+
+-----------------------------------------------------------------------------
+
+class Convertible (x :: a) (y :: b) where type Convert x :: b
 
 -----------------------------------------------------------------------------
 
