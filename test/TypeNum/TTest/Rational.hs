@@ -23,11 +23,10 @@ rationalSpec = describe "TypeNum.Integer.Rational'" $ do
     describe "is comparable at type-level (TypesEq and TypesOrd)" $ do
         specify "==" $ correct (B::B(Pos 4:%5 == Pos 4:%5))
                     && correct (B::B(Pos 4:%4 == AsRational (Pos 1)))
+                    && correct (B::B(Pos 4:%4 ~~ (Pos 1:%1)))
                     && correct (B::B(Pos 4:%4 ~~ Pos 1))
-                    && correct (B::B(Pos 2:%4 == Pos 1:%2))
+                    && correct (B::B(Pos 2:%4 ~~ (Pos 1:%2)))
 
-                    && correct (B::B(Rem (Pos 4) (Pos 5) == Pos 4))
-                    && correct (B::B(Rem (Pos 5) (Pos 4) == Pos 1))
 
         specify ">"  $ correct (B::B((Pos 7:%5) > (Pos 4:%5)))
                     && correct (B::B((Pos 1:%2) > (Pos 1:%3)))
@@ -42,13 +41,13 @@ rationalSpec = describe "TypeNum.Integer.Rational'" $ do
         it "provides type-level sum '(+)'"
 
                 $ correct (B::B(  (Pos 2:%2) + (Pos 2:%2) ~~ Pos 2 ))
-               && correct (B::B(  (Pos 2:%2) + (Pos 2:%2) == Pos 2:%1 ))
-               && correct (B::B(  (Pos 3:%2) + (Pos 3:%2) == Pos 3:%1 ))
---                $ correct (B::B(  (Pos 1:%2) + (Pos 1:%2) ~~ Pos 1 ))
---                $ correct (B::B(  (Pos 1:%3) + (Pos 1:%2) == (Pos 5:%6) ))
---              $ correct (B::B(  (Pos 3:%7) + (Pos 4:%7) == (Pos 7:%7) ))
---             && correct (B::B(  ((Pos 3:%7) + (Pos 4:%7) :: TRational) ~~ Pos 1 ))
---             && correct (B::B(  (Pos 1:%3) + (Pos 1:%2) == (Pos 5:%6) ))
+               && correct (B::B(  (Pos 2:%2) + (Pos 2:%2) == (Pos 2:%1) ))
+               && correct (B::B(  (Pos 3:%2) + (Pos 3:%2) == (Pos 3:%1) ))
+               && correct (B::B(  (Pos 1:%2) + (Pos 1:%2) ~~ Pos 1 ))
+               && correct (B::B(  (Pos 1:%3) + (Pos 1:%2) == (Pos 5:%6) ))
+               && correct (B::B(  (Pos 3:%7) + (Pos 4:%7) == (Pos 7:%7) ))
+               && correct (B::B(  (Pos 3:%7) + (Pos 4:%7) ~~ Pos 1 ))
+               && correct (B::B(  (Pos 1:%3) + (Pos 1:%2) == (Pos 5:%6) ))
 
 
         it "provides type-level absolute difference '(/-)'" $ example pending
