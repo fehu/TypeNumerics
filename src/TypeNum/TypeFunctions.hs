@@ -16,7 +16,8 @@
 
 module TypeNum.TypeFunctions (
 
-  TypesEq(..), TypesOrd(..)
+  TypesEq(..), type (=~=), type  (/~=)
+, TypesOrd(..)
 
 , Max, Min
 

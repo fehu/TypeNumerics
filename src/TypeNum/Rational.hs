@@ -93,8 +93,8 @@ instance ( TIntValue i, TIntValue n, TIntValue d
 --data FilterPrimesFunc (prev :: [TInt]) (arg :: (TInt, [TInt])) (res :: [TInt])
 --type instance (FilterPrimesFunc prev) :$: '(prime,pool) = FilterPrimes pool (Concat prev '[prime])
 --
---data ZeroRemFunc (den :: a) (num :: a) (res :: Bool)
---type instance (ZeroRemFunc den) :$: num = IsZero (Rem num den)
+--data ZeroRemFunc (den :: TInt) (num :: TInt) (res :: Bool)
+--type instance (ZeroRemFunc den) :$: num = Rem num den ~~ 0
 --
 --type Two = Succ (Succ Zero)
 --
@@ -112,30 +112,30 @@ instance ( TIntValue i, TIntValue n, TIntValue d
 --      then  d' <- d' `quot` i; n' <- n' `quot` i; use same i
 --      else leave d' and n' unchanged
 
---type family SimplifyRatio (n :: a) (d :: a) :: (a,a) where
+--type family SimplifyRatio (n :: TInt) (d :: TInt) :: (TInt,TInt) where
 --    SimplifyRatio n d =
 --        -- If numerator is zero, then there is no ratio part to simplify.
---        If (IsZero n) '(GetZero n, GetOne n) (SimplifyRatio' n d)
-
+--        If (n ~~ 0) '(Zero, Pos 1) (SimplifyRatio' n d)
+--
 --type family SimplifyRatio' (n :: a) (d :: a) :: (a,a) where
 --    SimplifyRatio' n d = Fold SimplifyFunc '(n,d) (PrimeNumbersTill (Max n d))
-
+--
 --data SimplifyFunc (arg :: (a,b)) (res :: a)
 --type instance SimplifyFunc :$: '( '(n,d), i ) = RepeatQuot i n d
-
+--
 --type family RepeatQuot i n d where
---    RepeatQuot i n d  = If (IsZero (Rem n i) && IsZero (Rem d i))
+--    RepeatQuot i n d  = If (Rem n i == 0 && Rem d i == 0)
 --                           (RepeatQuot i (Quot n i) (Quot d i))
 --                           '(n,d)
-
+--
 --type TRational'' i r = TRational' i (Fst r) (Snd r)
-
+--
 --type SimplifiedRatio n d = TRational'' (Quot n d) -- integer part
 --                                       (SimplifyRatio n d)
-
+--
 ---- | Programmer-friendly rational type constructor.
 --type (:%) (n :: TInt) (d :: Nat) = SimplifiedRatio n (Pos d)
-
+--
 ---- | Accessible rational type constructor.
 --type Rational' (int :: TInt) (num :: TInt) (den :: PosInt) =
 --    AsRational int + SimplifiedRatio num (Positive2Int den)
@@ -210,12 +210,18 @@ instance TypesOrd (r1 :: TRational) (r2 :: TRational) where type Cmp r1 r2 = Cmp
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
 
-type family TRationalIntSum (i :: TInt) (r :: TRational) :: TRational where
-    TRationalIntSum i0 (TRational' i n d) = TRational' (i + i0) n d
-
 type family TRationalSum (a :: TRational) (b :: TRational) :: TRational where
     TRationalSum (TRational' i1 n1 d1) (TRational' i2 n2 d2) =
         MkRational (i1+i2) (n1*d2 + n2*d1) (d1*d2)
+
+--type family TRationalSum (a :: TRational) (b :: TRational) :: TRational where
+--    TRationalSum (TRational' i1 Zero d1) (TRational' i2 Zero d2)  = TRational' (i1 + i2) Zero (Pos 1)
+--    TRationalSum (TRational' i1 Zero d1) (TRational' i2 n2   d2)  = TRational' (i1 + i2) n2 d2
+--    TRationalSum (TRational' i1 n1   d1) (TRational' i2 Zero d2)  = TRational' (i1 + i2) n1 d1
+--    TRationalSum (TRational' i1 n1   d1) (TRational' i2 n2   d2)  = AsRational (i1+i2)
+--                                                                  + SimplifiedRatio (n1*d2 + n2*d1)
+--                                                                                    (d1*d2)
+
 
 instance TypeNat (a :: TRational) (b :: TRational) where
     type x + y = TRationalSum x y
