@@ -111,7 +111,7 @@ class (TypesOrd x y, TypesOrd x x, TypesOrd y y) =>
 
 -----------------------------------------------------------------------------
 
-class (TypeNat x y) => TypeAbsDiff (x :: a) (y :: a) where
+class (TypeNat x y) => TypeAbsDiff (x :: n) (y :: n) where
         -- | Absolute difference.
         type (/-) x y :: n
 
