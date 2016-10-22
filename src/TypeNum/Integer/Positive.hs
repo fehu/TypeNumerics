@@ -8,7 +8,8 @@
 -- Stability   :
 -- Portability :
 --
--- |
+-- | It provides NO type-level absolute difference '(//-)', because there is
+--   no zero to represent no difference case.
 --
 
 {-# LANGUAGE Rank2Types, ConstraintKinds, FlexibleContexts #-}
@@ -22,6 +23,9 @@ module TypeNum.Integer.Positive
 , PosIntConvert(..)
 , Nat2PosInt(..)
 , Int2PosInt(..)
+
+, module TypeNum, module Data.Type.Equality
+
 )
 where
 
@@ -116,9 +120,8 @@ instance (PosIntValue p) =>
 -----------------------------------------------------------------------------
 
 instance TypeNat (a :: PosInt) b where
-    type a +  b = PosPlus a b
---    type a /- b = Nat2Positive (a /- b)
---    type a *  b = Nat2Positive (a  * b)
+    type a + b = PosPlus a b
+    type a * b = Nat2Positive (Positive2Nat a  * Positive2Nat b)
 
 
 type family PosPlus a b where
@@ -126,8 +129,6 @@ type family PosPlus a b where
     PosPlus x One = PosSucc x
     PosPlus (PosSucc y) x = PosPlus y (PosSucc x)
 
---type family PosDiff a b where
---    PosDiff
 
 -----------------------------------------------------------------------------
 
