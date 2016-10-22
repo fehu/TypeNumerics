@@ -75,6 +75,13 @@ instance ( TIntValue i, TIntValue n, TIntValue d
         type Denominator (TRational' i n d) = Int2Positive d
 
 
+instance (KnownRatio r) => Show (Ratio' r)
+    where show r = if intValue (numerator' r) == 0
+                   then show (integerPart r)
+                   else "{" ++ show (integerPart r)
+                     ++ "," ++ show (numerator' r)
+                     ++ "/" ++ show (denominator' r)
+                     ++ "}"
 
 -----------------------------------------------------------------------------
 -- Tried to simplify ratio, but the compiler enters infinite recursion.
