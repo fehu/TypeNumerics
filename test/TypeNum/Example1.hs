@@ -8,7 +8,7 @@
 -- Stability   :
 -- Portability :
 --
--- |
+-- | Using 'AsRational' to treat integer numbers as rationals.
 --
 
 {-# LANGUAGE FlexibleContexts, PolyKinds #-}
