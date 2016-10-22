@@ -35,6 +35,11 @@ import GHC.Real
 
 import Data.Type.Bool
 
+-----------------------------------------------------------------------------
+
+infixl 7 :%
+
+-----------------------------------------------------------------------------
 
 -- | Kind-promotable rational inner representation.
 --   The integer part of the number always must be extracted,
@@ -68,6 +73,7 @@ instance ( TIntValue i, TIntValue n, TIntValue d
         type IntegerPart (TRational' i n d) = i
         type Numerator   (TRational' i n d) = n
         type Denominator (TRational' i n d) = Int2Positive d
+
 
 
 -----------------------------------------------------------------------------
@@ -163,6 +169,8 @@ instance MaybeRational (TRational' i n d) where type AsRational (TRational' i n 
 
 instance MaybeRational (i :: TInt)   where type AsRational i = TRational' i                 Zero (Succ Zero)
 instance MaybeRational (i :: PosInt) where type AsRational i = TRational' (Positive2Int i)  Zero (Succ Zero)
+instance MaybeRational (n :: Nat)    where type AsRational n = TRational' (Pos n)           Zero (Succ Zero)
+
 
 --type family AsRational (a :: k) :: TRational
 --
@@ -194,6 +202,9 @@ type family RationalEq (r1 :: TRational) (r2 :: TRational) where
     RationalEq (TRational' i1 n1 d1) (TRational' i2 n2 d2) =
         i1 == i2 && n1*d2 == n2*d1
 
+
+-----------------------------------------------------------------------------
+
 -- The simpified rational numbers equal when integer parts, numerators and denominators are equal.
 instance TypesEq (r1 :: TRational) (r2 :: TRational) where type r1 ~~ r2 = r1 == r2
 type instance a == b = RationalEq a b -- TRationalAsList a == TRationalAsList b
@@ -201,8 +212,14 @@ type instance a == b = RationalEq a b -- TRationalAsList a == TRationalAsList b
 
 instance TypesEq (r :: TRational) (i :: TInt) where type r ~~ i  = Numerator r == Zero
                                                                 && IntegerPart r == i
+instance TypesEq (i :: TInt) (r :: TRational) where type i ~~ r  = r ~~ i
 
-instance TypesEq (i :: TInt) (r :: TRational) where type i ~~ r = r ~~ i
+instance TypesEq (r :: TRational) (n :: Nat)  where type r ~~ n  = Numerator r == Zero
+                                                                && IntegerPart r == Pos n
+instance TypesEq (n :: Nat) (r :: TRational)  where type n ~~ r  = r ~~ n
+
+
+-----------------------------------------------------------------------------
 
 -- The comparison is done lexicographically: first whole parts, then remaning ratios.
 instance TypesOrd (r1 :: TRational) (r2 :: TRational) where type Cmp r1 r2 = CmpRational r1 r2
@@ -223,7 +240,32 @@ type family TRationalSum (a :: TRational) (b :: TRational) :: TRational where
 --                                                                                    (d1*d2)
 
 
+type LiftInt2Numerator r = IntegerPart r * Positive2Int (Denominator r)
+                         + Numerator r
+
+
+type family TRationalAbsDiff a b where
+    TRationalAbsDiff (r1 :: TRational) (r2 :: TRational) =
+        (     (LiftInt2Numerator r1) * Positive2Int (Denominator r2)
+           /- (LiftInt2Numerator r2) * Positive2Int (Denominator r1)
+        )
+        :% (Positive2Nat (Denominator r1 * Denominator r2))
+
+type family TRationalMult a b where
+    TRationalMult (r1 :: TRational) (r2 :: TRational) =
+        ( (LiftInt2Numerator r1) * (LiftInt2Numerator r2) )
+        :% (Positive2Nat (Denominator r1 * Denominator r2))
+
+-----------------------------------------------------------------------------
+
 instance TypeNat (a :: TRational) (b :: TRational) where
     type x + y = TRationalSum x y
+    type x * y = TRationalMult x y
 
 
+instance TypeAbsDiff (a :: TRational) (b :: TRational) where
+    type x /- y = TRationalAbsDiff x y
+
+
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
