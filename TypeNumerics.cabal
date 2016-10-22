@@ -55,16 +55,16 @@ test-suite type-tests
                         TypeFamilies
                         UndecidableInstances
 
---executable example1
---  main-is:test/TypeNum/Example1.hs
---
---  build-depends:       TypeNumerics
---                     , base >=4.8 && <4.9
---                     , hspec >= 2.2 && < 2.3
---
---  default-language:    Haskell2010
---  default-extensions:   TypeOperators
---                        DataKinds
---                        TypeFamilies
---                        UndecidableInstances
+executable example1
+  main-is:test/TypeNum/Example1.hs
+
+  build-depends:       TypeNumerics
+                     , base >=4.8 && <4.9
+                     , hspec >= 2.2 && < 2.3
+
+  default-language:    Haskell2010
+  default-extensions:   TypeOperators
+                        DataKinds
+                        TypeFamilies
+                        UndecidableInstances
 
