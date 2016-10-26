@@ -23,6 +23,7 @@ rationalSpec = describe "TypeNum.Integer.Rational'" $ do
     describe "is comparable at type-level (TypesEq and TypesOrd)" $ do
         specify "==" $ correct (B::B( Pos 4 :% 5 == Pos 4:%5 ))
                     && correct (B::B( Pos 4:%4 == AsRational (Pos 1) ))
+                    && correct (B::B( Neg 1:%1 == AsRational (Neg 1) ))
                     && correct (B::B( Pos 4:%4 ~~ Pos 1:%1 ))
                     && correct (B::B( Pos 4:%4 ~~ Pos 1 ))
                     && correct (B::B( Pos 2:%4 ~~ Pos 1:%2 ))
@@ -74,10 +75,22 @@ rationalSpec = describe "TypeNum.Integer.Rational'" $ do
         it "provides type-level power '(^)'"                $ example pending
 
     describe "has sign operations at type-level (TypeSign)" $ do
-        it "provides type-level sign"           $ example pending
-        it "provides type-level absolute value" $ example pending
-        it "provides type-level unary negation" $ example pending
-        it "provides type-level sign to number transformation" $ example pending
+        it "provides type-level sign"
+                $ correct (B::B( Signum (Pos 2:%3) == SignPos ))
+               && correct (B::B( Signum (Neg 2:%3) == SignNeg ))
+               && correct (B::B( Signum (Neg 0:%3) == SignZero ))
+        it "provides type-level absolute value"
+                $ correct (B::B( Abs (Pos 2:%3) == Pos 2:%3 ))
+               && correct (B::B( Abs (Neg 2:%3) == Pos 2:%3 ))
+               && correct (B::B( Abs (Neg 0:%3) ~~ Zero     ))
+        it "provides type-level unary negation"
+                $ correct (B::B( Negate (Pos 2:%3) == Neg 2:%3 ))
+               && correct (B::B( Negate (Neg 2:%3) == Pos 2:%3 ))
+               && correct (B::B( Negate (Neg 0:%3) ~~ Zero     ))
+        it "provides type-level sign to number transformation"
+                $ correct (B::B( FromSign SignPos  == Pos 1:%1 ))
+               && correct (B::B( FromSign SignNeg  == Neg 1:%1 ))
+               && correct (B::B( FromSign SignZero == Pos 0:%1 ))
 
     describe "has subtraction operation at type-level (TypesSubtraction)" $
         it "provides type-level subtraction (-)" $ example pending

@@ -38,6 +38,8 @@ import Data.Type.Bool
 import Data.Type.Equality hiding (type (==))
 import Data.Type.Equality
 
+--import GHC.TypeLits (ErrorMessage) TODO: update GHC
+
 -----------------------------------------------------------------------------
 
 
@@ -173,8 +175,15 @@ type family IntMult' (a :: TInt) (b :: TInt) :: Nat where
 
 
 type family QuotRemInt (a :: TInt) (b :: TInt) :: (TInt, TInt) where
-    QuotRemInt a b = QuotRemInt' a (CmpInt a b) b Zero
+    QuotRemInt a b = QuotRemSign (SignsMult (Signum a) (Signum b))
+                                 (QuotRemInt' (Abs a) (CmpInt (Abs a) (Abs b)) (Abs b) Zero)
 
+
+type family QuotRemSign (sign :: Sign) (quotrem :: (TInt, TInt)) :: (TInt, TInt) where
+    QuotRemSign SignNeg '(q,r) = '(Negate q, Negate r)
+    QuotRemSign sign    '(q,r) = '(q,r)
+
+--
 type family QuotRemInt' (a :: TInt) (ord :: Ordering) (b :: TInt) (quot :: TInt) :: (TInt, TInt)
     where QuotRemInt' a LT b quot = '(quot, a)
           QuotRemInt' a EQ b quot = '(Succ quot, Zero)

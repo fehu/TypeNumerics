@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                TypeNumerics
-version:             0.2.3.2
+version:             0.2.3.3
 -- synopsis:
 -- description:
 license:             MIT
@@ -41,6 +41,7 @@ test-suite type-tests
   type:                exitcode-stdio-1.0
 
   hs-source-dirs:      test
+
   main-is:             TypeNum/TTest.hs
   other-modules:       TypeNum.TTest.Common
 

@@ -13,12 +13,14 @@
 
 {-# LANGUAGE FlexibleContexts
            , PolyKinds
+           , ExistentialQuantification
        #-}
 
 module TypeNum.Rational(
 
   TRational, (:%), Rational'
 , KnownRatio(..), Ratio'(..)
+, SomeRatio'(..), someRatioValue
 
 , MaybeRational(..)
 
@@ -48,8 +50,12 @@ infixl 7 :%
 data TRational = TRational' TInt TInt TInt    -- ^ Whole part, numerator, denominator
 
 -- | 'TRational' type container.
-data (KnownRatio r) => Ratio' (r :: TRational) = Ratio'
+data Ratio' (r :: TRational) = Ratio'
 
+data SomeRatio' = forall r . KnownRatio r => SomeRatio' (Ratio' r)
+
+someRatioValue :: SomeRatio' -> Rational
+someRatioValue (SomeRatio' r) = runtimeValue r
 
 class   ( TIntValue (IntegerPart r)
         , TIntValue (Numerator r)
@@ -169,12 +175,12 @@ type Rational' (int :: TInt) (num :: TInt) (den :: PosInt) =
 -----------------------------------------------------------------------------
 
 class MaybeRational (a :: k) where type AsRational a :: TRational
-                                   asRational :: NumContainer a a -> Ratio' (AsRational a)
-                                   asRational = const Ratio'
+                                   asRational  :: Ratio' (AsRational a)
+                                   asRational  = Ratio'
 
 instance MaybeRational (TRational' i n d) where type AsRational (TRational' i n d) = TRational' i n d
 
-instance MaybeRational (i :: TInt)   where type AsRational i = TRational' i                 Zero (Succ Zero)
+instance MaybeRational (i :: TInt)   where type AsRational i = i:%1 -- TRational' i                 Zero (Succ Zero)
 instance MaybeRational (i :: PosInt) where type AsRational i = TRational' (Positive2Int i)  Zero (Succ Zero)
 instance MaybeRational (n :: Nat)    where type AsRational n = TRational' (Pos n)           Zero (Succ Zero)
 
@@ -196,10 +202,9 @@ type family CmpRational (r1 :: TRational) (r2 :: TRational) :: Ordering where
 
 -----------------------------------------------------------------------------
 
-instance (KnownRatio (TRational' i n d)) =>
-  TypeNumValue (TRational' i n d) where
-    type NumValue     (TRational' i n d) = Rational
-    type NumContainer (TRational' i n d) = Ratio'
+instance (KnownRatio r) => TypeNumValue (r :: TRational) where
+    type NumValue     r = Rational
+    type NumContainer r = Ratio'
     runtimeValue r = (int*den+num) :% den
         where int = intValue $ integerPart r
               num = intValue $ numerator' r
@@ -276,3 +281,16 @@ instance TypeAbsDiff (a :: TRational) (b :: TRational) where
 
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
+
+type family TRationalSign (r :: TRational) :: Sign where
+    TRationalSign (TRational' Zero n d) = Signum n
+    TRationalSign (TRational' i n d)    = Signum i
+
+
+instance TypeSign (a :: TRational) where
+    type Signum x                   = TRationalSign x
+    type Abs (TRational' i n d)     = TRational' (Abs i) (Abs n) d
+    type Negate (TRational' i n d)  = TRational' (Negate i) (Negate n) d
+    type FromSign s                 = AsRational (FromSign s :: TInt)
+
+

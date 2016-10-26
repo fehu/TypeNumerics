@@ -31,7 +31,9 @@ module TypeNum (
 
 --, Convertible(..)
 
-, module TypeNum.TypeFunctions
+, TypesEq(..), TypesOrd (..)
+
+--, module TypeNum.TypeFunctions
 
 ) where
 

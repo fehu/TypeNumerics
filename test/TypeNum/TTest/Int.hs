@@ -118,6 +118,8 @@ intSpec = describe "TypeNum.Integer.TInt" $ do
             && correct (B::B (((QuotRem (Pos 2) (Pos 1)) :: (TInt, TInt)) == ('(Pos 2, Zero))))
             && correct (B::B (((QuotRem (Pos 4) (Pos 3)) :: (TInt, TInt)) == ('(Pos 1, Pos 1))))
 
+            && correct (B::B (((QuotRem (Neg 4) (Pos 3)) :: (TInt, TInt)) == ('(Neg 1, Neg 1))))
+
             && correct (B::B (((Rem (Pos 3) (Pos 3)) :: TInt) == Zero))
             && correct (B::B (((Rem (Pos 3) (Pos 3)) :: TInt) < Pos 1))
             && correct (B::B (((Rem (Pos 4) (Pos 3)) :: TInt) == Pos 1))
