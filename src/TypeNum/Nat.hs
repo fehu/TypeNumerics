@@ -38,7 +38,7 @@ import Data.Type.Equality
 
 data Nat' (n :: Nat) = Nat'
 
-instance TypesEq  (a :: Nat) (b :: Nat) where type a ~~ b  = a == b
+instance TypesEq  (a :: Nat) (b :: Nat) where type a ~=~ b  = a == b
 instance TypesOrd (a :: Nat) (b :: Nat) where type Cmp a b = CmpNat a b
 
 

@@ -24,13 +24,13 @@ intSpec = describe "TypeNum.Integer.TInt" $ do
     describe "is comparable at type-level ((==), TypesEq and TypesOrd)" $ do
 
         specify "==" $ correct (B::B (Pos 1 == Pos 1))
-                    && correct (B::B (Pos 1 ~~ 1))
+                    && correct (B::B (Pos 1 ~=~ 1))
                     && correct (B::B (Neg 5 == Neg 5))
 
                     && correct (B::B (Pos 0 == Neg 0))
-                    && correct (B::B (Pos 0 ~~ 0))
+                    && correct (B::B (Pos 0 ~=~ 0))
 
-                    && mistake (B::B (Neg 1 ~~ 1))
+                    && mistake (B::B (Neg 1 ~=~ 1))
                     && mistake (B::B (Pos 5 == Pos 2))
 
         specify ">"  $ correct (B::B (Pos 2 > Pos 1))
@@ -85,27 +85,27 @@ intSpec = describe "TypeNum.Integer.TInt" $ do
             && mistake (B::B ((Neg 4 + Pos 5 :: TInt) == (Pos 5 + Pos 4 :: TInt)))
 
         it "provides type-level absolute difference '(/-)'" $
-               correct (B::B ((Pos 1 /- Pos 3 :: TInt) ~~ 2))
-            && correct (B::B ((Pos 3 /- Pos 1 :: TInt) ~~ 2))
-            && correct (B::B ((Pos 3 /- Pos 3 :: TInt) ~~ 0))
+               correct (B::B ((Pos 1 /- Pos 3 :: TInt) ~=~ 2))
+            && correct (B::B ((Pos 3 /- Pos 1 :: TInt) ~=~ 2))
+            && correct (B::B ((Pos 3 /- Pos 3 :: TInt) ~=~ 0))
 
-            && correct (B::B ((Neg 1 /- Neg 3 :: TInt) ~~ 2))
-            && correct (B::B ((Neg 1 /- Pos 3 :: TInt) ~~ 4))
-            && correct (B::B ((Pos 1 /- Neg 3 :: TInt) ~~ 4))
+            && correct (B::B ((Neg 1 /- Neg 3 :: TInt) ~=~ 2))
+            && correct (B::B ((Neg 1 /- Pos 3 :: TInt) ~=~ 4))
+            && correct (B::B ((Pos 1 /- Neg 3 :: TInt) ~=~ 4))
 
-            && mistake (B::B ((Pos 3 /- Pos 3 :: TInt) ~~ 2))
+            && mistake (B::B ((Pos 3 /- Pos 3 :: TInt) ~=~ 2))
 
         it "provides type-level multiplication '(*)'" $
-               correct (B::B ((Pos 1 * Pos 3 :: TInt) ~~ 3))
-            && correct (B::B ((Pos 3 * Pos 1 :: TInt) ~~ 3))
+               correct (B::B ((Pos 1 * Pos 3 :: TInt) ~=~ 3))
+            && correct (B::B ((Pos 3 * Pos 1 :: TInt) ~=~ 3))
 
             && correct (B::B ((Neg 3 * Pos 1 :: TInt) == Neg 3))
             && correct (B::B ((Neg 3 * Neg 1 :: TInt) == Pos 3))
 
-            && correct (B::B ((Neg 3 * Zero :: TInt) ~~ 0))
-            && correct (B::B ((Zero * Pos 9 :: TInt) ~~ 0))
+            && correct (B::B ((Neg 3 * Zero :: TInt) ~=~ 0))
+            && correct (B::B ((Zero * Pos 9 :: TInt) ~=~ 0))
 
-            && mistake (B::B ((Pos 2 * Pos 3 :: TInt) ~~ 9))
+            && mistake (B::B ((Pos 2 * Pos 3 :: TInt) ~=~ 9))
 
         it "provides type-level power '(^)'" $ pending
 

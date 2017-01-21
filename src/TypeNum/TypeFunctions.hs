@@ -60,7 +60,7 @@ import Data.Type.Equality
 
 -----------------------------------------------------------------------------
 
-infix 4 ~~, =~=, /~=
+infix 4 ~=~, =~=, /~=
 infix 4 <, <=, >, >=
 
 -----------------------------------------------------------------------------
@@ -68,11 +68,11 @@ infix 4 <, <=, >, >=
 
 class TypesEq  (x :: a) (y :: b) where
     -- | Types equality, permitting types of different kinds.
-    type (~~) (x :: a) (y :: b) :: Bool
+    type (~=~) (x :: a) (y :: b) :: Bool
 
 
-type (=~=) a b = (a ~~ b) ~ True
-type (/~=) a b = (a ~~ b) ~ False
+type (=~=) a b = (a ~=~ b) ~ True
+type (/~=) a b = (a ~=~ b) ~ False
 
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
@@ -90,8 +90,8 @@ class (TypesEq x y) =>
         type a < b = Cmp a b == LT
         type a > b = Cmp a b == GT
 
-        type a <= b = a ~~ b || a < b
-        type a >= b = a ~~ b || a > b
+        type a <= b = a ~=~ b || a < b
+        type a >= b = a ~=~ b || a > b
 
 
 type Max (x :: a) (y :: b) = If (x >= y) x y
@@ -102,12 +102,12 @@ type Min (x :: a) (y :: b) = If (x <= y) x y
 
 
 
-instance TypesEq (a :: Ordering) (b :: Ordering) where type a ~~ b = a == b
+instance TypesEq (a :: Ordering) (b :: Ordering) where type a ~=~ b = a == b
 
 -----------------------------------------------------------------------------
 
 instance TypesEq (a :: (x,y)) (b :: (x,y)) where
-    type a ~~ b = (Fst a == Fst b) && (Snd a == Snd b)
+    type a ~=~ b = (Fst a == Fst b) && (Snd a == Snd b)
 
 instance TypesOrd (a :: (x,y)) (b :: (x,y)) where
     type Cmp a b = Cmp2 a b
@@ -115,7 +115,7 @@ instance TypesOrd (a :: (x,y)) (b :: (x,y)) where
 -----------------------------------------------------------------------------
 
 instance TypesEq (a :: [x]) (b :: [x]) where
-    type a ~~ b = All EqFunc (Zip a b)
+    type a ~=~ b = All EqFunc (Zip a b)
 
 -- Lexicographical order.
 instance TypesOrd (h1 ': t1 :: [x]) (h2 ': t2 :: [x]) where
@@ -190,10 +190,10 @@ type family Seconds (p :: ((a,b), (a,b))) f :: ((a,c), (a,c))
 -----------------------------------------------------------------------------
 
 data EqFunc (arg :: (a,b)) (res :: Bool)
-type instance EqFunc :$: '(x,y) = x ~~ y
+type instance EqFunc :$: '(x,y) = x ~=~ y
 
 data EqualFunc (val :: a) (arg :: b) (res :: Bool)
-type instance (EqualFunc x) :$: y = x ~~ y
+type instance (EqualFunc x) :$: y = x ~=~ y
 
 
 
@@ -261,4 +261,3 @@ data ACFunc2 a c
 type instance ACFunc2 :$: '(A', A') = '(C', C')
 
 type Y = Firsts '( '(A',B'), '(A',B')) ACFunc2
-

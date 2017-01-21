@@ -170,7 +170,7 @@ class (TypeNat x y) =>
 -----------------------------------------------------------------------------
 
 
-instance TypesEq (a :: Sign) (b :: Sign) where type a ~~ b = SameSign a b
+instance TypesEq (a :: Sign) (b :: Sign) where type a ~=~ b = SameSign a b
 type instance a == b = SameSign a b
 
 -----------------------------------------------------------------------------

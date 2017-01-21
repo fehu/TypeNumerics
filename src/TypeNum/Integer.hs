@@ -191,13 +191,13 @@ type family QuotRemInt' (a :: TInt) (ord :: Ordering) (b :: TInt) (quot :: TInt)
 
 -----------------------------------------------------------------------------
 
-instance TypesEq  (a :: TInt) (b :: TInt) where type a ~~ b = IntEq a b
+instance TypesEq  (a :: TInt) (b :: TInt) where type a ~=~ b = IntEq a b
 instance TypesOrd (a :: TInt) (b :: TInt) where type Cmp a b = CmpInt a b
 
-instance TypesEq  (a :: TInt) (b :: Nat)  where type a ~~ b = a == Pos b
+instance TypesEq  (a :: TInt) (b :: Nat)  where type a ~=~ b = a == Pos b
 instance TypesOrd (a :: TInt) (b :: Nat)  where type Cmp a b = CmpInt a (Pos b)
 
-instance TypesEq  (a :: Nat) (b :: TInt)  where type a ~~ b = Pos a == b
+instance TypesEq  (a :: Nat) (b :: TInt)  where type a ~=~ b = Pos a == b
 instance TypesOrd (a :: Nat) (b :: TInt)  where type Cmp a b = CmpInt (Pos a) b
 
 type instance a == b = IntEq a b

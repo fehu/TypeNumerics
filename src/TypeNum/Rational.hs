@@ -113,7 +113,7 @@ instance (KnownRatio r) => Show (Ratio' r)
 --type instance (FilterPrimesFunc prev) :$: '(prime,pool) = FilterPrimes pool (Concat prev '[prime])
 --
 --data ZeroRemFunc (den :: TInt) (num :: TInt) (res :: Bool)
---type instance (ZeroRemFunc den) :$: num = Rem num den ~~ 0
+--type instance (ZeroRemFunc den) :$: num = Rem num den ~=~ 0
 --
 --type Two = Succ (Succ Zero)
 --
@@ -134,7 +134,7 @@ instance (KnownRatio r) => Show (Ratio' r)
 --type family SimplifyRatio (n :: TInt) (d :: TInt) :: (TInt,TInt) where
 --    SimplifyRatio n d =
 --        -- If numerator is zero, then there is no ratio part to simplify.
---        If (n ~~ 0) '(Zero, Pos 1) (SimplifyRatio' n d)
+--        If (n ~=~ 0) '(Zero, Pos 1) (SimplifyRatio' n d)
 --
 --type family SimplifyRatio' (n :: a) (d :: a) :: (a,a) where
 --    SimplifyRatio' n d = Fold SimplifyFunc '(n,d) (PrimeNumbersTill (Max n d))
@@ -175,8 +175,8 @@ type Rational' (int :: TInt) (num :: TInt) (den :: PosInt) =
 -----------------------------------------------------------------------------
 
 class MaybeRational (a :: k) where type AsRational a :: TRational
-                                   asRational  :: Ratio' (AsRational a)
-                                   asRational  = Ratio'
+                                   asRational :: x a -> Ratio' (AsRational a)
+                                   asRational =  const Ratio'
 
 instance MaybeRational (TRational' i n d) where type AsRational (TRational' i n d) = TRational' i n d
 
@@ -218,17 +218,17 @@ type family RationalEq (r1 :: TRational) (r2 :: TRational) where
 -----------------------------------------------------------------------------
 
 -- The simpified rational numbers equal when integer parts, numerators and denominators are equal.
-instance TypesEq (r1 :: TRational) (r2 :: TRational) where type r1 ~~ r2 = r1 == r2
+instance TypesEq (r1 :: TRational) (r2 :: TRational) where type r1 ~=~ r2 = r1 == r2
 type instance a == b = RationalEq a b -- TRationalAsList a == TRationalAsList b
 
 
-instance TypesEq (r :: TRational) (i :: TInt) where type r ~~ i  = Numerator r == Zero
+instance TypesEq (r :: TRational) (i :: TInt) where type r ~=~ i  = Numerator r == Zero
                                                                 && IntegerPart r == i
-instance TypesEq (i :: TInt) (r :: TRational) where type i ~~ r  = r ~~ i
+instance TypesEq (i :: TInt) (r :: TRational) where type i ~=~ r  = r ~=~ i
 
-instance TypesEq (r :: TRational) (n :: Nat)  where type r ~~ n  = Numerator r == Zero
+instance TypesEq (r :: TRational) (n :: Nat)  where type r ~=~ n  = Numerator r == Zero
                                                                 && IntegerPart r == Pos n
-instance TypesEq (n :: Nat) (r :: TRational)  where type n ~~ r  = r ~~ n
+instance TypesEq (n :: Nat) (r :: TRational)  where type n ~=~ r  = r ~=~ n
 
 
 -----------------------------------------------------------------------------
@@ -292,5 +292,3 @@ instance TypeSign (a :: TRational) where
     type Abs (TRational' i n d)     = TRational' (Abs i) (Abs n) d
     type Negate (TRational' i n d)  = TRational' (Negate i) (Negate n) d
     type FromSign s                 = AsRational (FromSign s :: TInt)
-
-
