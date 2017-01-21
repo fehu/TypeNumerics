@@ -31,7 +31,7 @@ module TypeNum (
 
 --, Convertible(..)
 
-, TypesEq(..), TypesOrd (..)
+, TypesEq(..), type (=~=), type  (/~=), TypesOrd (..)
 
 --, module TypeNum.TypeFunctions
 
@@ -178,4 +178,3 @@ type instance a == b = SameSign a b
 class Convertible (x :: a) (y :: b) where type Convert x :: b
 
 -----------------------------------------------------------------------------
-

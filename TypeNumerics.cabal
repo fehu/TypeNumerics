@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                TypeNumerics
-version:             0.2.4.0
+version:             0.2.4.1
 -- synopsis:
 -- description:
 license:             MIT

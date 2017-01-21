@@ -19,7 +19,9 @@ module TypeNum.Nat (
 
 , NatSucc, NatPrev
 
-, TypesEq(..), TypesOrd(..), TypeNat(..)
+, TypesEq(..), type (=~=), type  (/~=), TypesOrd(..)
+
+, TypeNat(..)
 
 , module Data.Type.Equality
 
@@ -80,8 +82,3 @@ type family QuotRemNat' (a :: Nat) (ord :: Ordering) (b :: Nat) (quot :: Nat) ::
     QuotRemNat' a LT b quot = '(quot, a)
     QuotRemNat' a EQ b quot = '(quot + 1, 0)
     QuotRemNat' a GT b quot = QuotRemNat' (a - b) (Cmp (a - b) b) b (quot + 1)
-
-
-
-
-
