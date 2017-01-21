@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 --
--- Module      :  TypeNum.TTest.PosInt
+-- Module      :  TypeNum.Test.PosInt
 -- Copyright   :
 -- License     :  MIT
 --
@@ -12,9 +12,9 @@
 --
 
 
-module TypeNum.TTest.PosInt where
+module TypeNum.Test.PosInt where
 
-import TypeNum.TTest.Common
+import TypeNum.Test.Common
 import TypeNum.Integer.Positive
 
 
@@ -46,6 +46,3 @@ posIntSpec = describe "TypeNum.Integer.Positive.PosInt" $ do
             example pending
         it "provides type-level integer division truncated toward negative infinity 'Div'" $
             example pending
-
-
-

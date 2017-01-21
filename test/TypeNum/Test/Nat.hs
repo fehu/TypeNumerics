@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 --
--- Module      :  TypeNum.TTest.Nat
+-- Module      :  TypeNum.Test.Nat
 -- Copyright   :
 -- License     :  MIT
 --
@@ -13,9 +13,9 @@
 
 --{-# LANGUAGE ConstraintKinds #-}
 
-module TypeNum.TTest.Nat where
+module TypeNum.Test.Nat where
 
-import TypeNum.TTest.Common
+import TypeNum.Test.Common
 import TypeNum.Nat
 
 -----------------------------------------------------------------------------
@@ -72,8 +72,3 @@ natSpec = describe "GHC.TypeLits.Nat" $ do
 
         it "provides type-level integer division truncated toward negative infinity 'Div'" $
             example pending
-
-
-
-
-

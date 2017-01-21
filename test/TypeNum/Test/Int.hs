@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 --
--- Module      :  TypeNum.TTest.Int
+-- Module      :  TypeNum.Test.Int
 -- Copyright   :
 -- License     :  MIT
 --
@@ -12,9 +12,9 @@
 --
 -----------------------------------------------------------------------------
 
-module TypeNum.TTest.Int where
+module TypeNum.Test.Int where
 
-import TypeNum.TTest.Common
+import TypeNum.Test.Common
 import TypeNum.Integer
 
 -----------------------------------------------------------------------------
@@ -137,7 +137,3 @@ intSpec = describe "TypeNum.Integer.TInt" $ do
 
     describe "has subtraction operation at type-level (TypesSubtraction)" $
         it "provides type-level subtraction (-)" $ example pending
-
-
-
-

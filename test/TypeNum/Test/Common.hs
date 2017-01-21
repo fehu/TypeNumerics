@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 --
--- Module      :  TypeNum.TTest.Common
+-- Module      :  TypeNum.Test.Common
 -- Copyright   :
 -- License     :  MIT
 --
@@ -14,7 +14,7 @@
 {-# LANGUAGE GADTs, PolyKinds #-}
 
 
-module TypeNum.TTest.Common(
+module TypeNum.Test.Common(
 
   correct, mistake
 , B(..)
@@ -40,4 +40,3 @@ correct _ = True
 
 mistake :: (expr ~ False) => c expr -> Bool
 mistake _ = True
-

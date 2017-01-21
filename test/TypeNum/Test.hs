@@ -2,11 +2,11 @@
 
 module Main where
 
-import TypeNum.TTest.Common
-import TypeNum.TTest.Nat
-import TypeNum.TTest.Int
-import TypeNum.TTest.PosInt
-import TypeNum.TTest.Rational
+import TypeNum.Test.Common
+import TypeNum.Test.Nat
+import TypeNum.Test.Int
+import TypeNum.Test.PosInt
+import TypeNum.Test.Rational
 
 -----------------------------------------------------------------------------
 
@@ -15,4 +15,3 @@ main = hspec $ do natSpec
                   intSpec
                   posIntSpec
                   rationalSpec
-

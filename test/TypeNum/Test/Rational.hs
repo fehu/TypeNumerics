@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------
 --
--- Module      :  TypeNum.TTest.Rational
+-- Module      :  TypeNum.Test.Rational
 -- Copyright   :
 -- License     :  MIT
 --
@@ -13,16 +13,21 @@
 
 {-# OPTIONS_GHC -freduction-depth=1000 #-}
 
-module TypeNum.TTest.Rational where
+{-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleContexts #-}
 
-import TypeNum.TTest.Common
+module TypeNum.Test.Rational where
+
+import TypeNum.Test.Common
 import TypeNum.Rational
 
 -----------------------------------------------------------------------------
 
 rationalSpec = describe "TypeNum.Integer.Rational'" $ do
 
-    describe "is comparable at type-level (TypesEq and TypesOrd)" $ do
+    describe "Comparable at type-level (TypesEq and TypesOrd)" $ do
         specify "==" $ correct (B::B( Pos 4 :% 5 == Pos 4:%5 ))
                     && correct (B::B( Pos 4:%4 == AsRational (Pos 1) ))
                     && correct (B::B( Neg 1:%1 == AsRational (Neg 1) ))
@@ -44,7 +49,7 @@ rationalSpec = describe "TypeNum.Integer.Rational'" $ do
         specify ">=" $ example pending
         specify "<=" $ example pending
 
-    describe "has natural number operations at type-level (TypesNat)" $ do
+    describe "Has natural number operations at type-level (TypesNat)" $ do
 
         it "provides type-level sum '(+)'"
                 $ correct (B::B(  (Pos 2:%2) + (Pos 2:%2) ~=~ Pos 2    ))
@@ -70,13 +75,13 @@ rationalSpec = describe "TypeNum.Integer.Rational'" $ do
         it "provides type-level multiplication '(*)'"
                 $ correct (B::B( (Pos 1:%1) * (Pos 1:%1)      ~=~ 1        ))
                && correct (B::B( (Pos 1:%2) * (Pos 1:%3)      == Pos 1:%6 ))
-               && correct (B::B( (Pos 1:%2) * (AsRational 2)  ~=~ 1        ))
+              --  && correct (B::B( (Pos 1:%2) * (AsRational 2)  ~=~ 1        ))
                && correct (B::B( (Pos 2:%3) * (Pos 3:%5)      == Pos 2:%5 ))
                && correct (B::B( (Pos 2:%3) * (Neg 1:%3)      == Neg 2:%9 ))
 
         it "provides type-level power '(^)'"                $ example pending
 
-    describe "has sign operations at type-level (TypeSign)" $ do
+    describe "Has sign operations at type-level (TypeSign)" $ do
         it "provides type-level sign"
                 $ correct (B::B( Signum (Pos 2:%3) == SignPos ))
                && correct (B::B( Signum (Neg 2:%3) == SignNeg ))
@@ -94,8 +99,30 @@ rationalSpec = describe "TypeNum.Integer.Rational'" $ do
                && correct (B::B( FromSign SignNeg  == Neg 1:%1 ))
                && correct (B::B( FromSign SignZero == Pos 0:%1 ))
 
-    describe "has subtraction operation at type-level (TypesSubtraction)" $
+    describe "Has subtraction operation at type-level (TypesSubtraction)" $
         it "provides type-level subtraction (-)" $ example pending
 
-    describe "has rational number operations at type-level (TypesRational)" $
+    describe "Has rational number operations at type-level (TypesRational)" $
         it "provides type-level rational division (/)" $ example pending
+
+    describe "Can treat integers as rationals" $
+      it "explicitly, using AsRational -- from:MaybeRational"
+         $ correct (B::B( (Pos 1:%2) * (AsRational 2)           ~=~ 1        ))
+        && correct (B::B( (Pos 1:%2) * (AsRational (Pos 2:%1))  ~=~ 1        ))
+
+        && correct (B::B( (Test (Pos 2:%1)) ~=~ (Test 2)  ))
+
+        && correct (B::B(        Pos 2:%1   ~=~ Test 2  ))
+        && mistake (B::B(        Pos 1:%2   ~=~ Test 2  ))
+
+
+newtype ( MaybeRational a
+        , KnownRatio (AsRational a)
+        ) =>
+  Test (a :: k) = Test (Ratio' (AsRational a))
+
+instance TypesEq (Test a) (Test b) where
+  type (Test a) ~=~ (Test b) = (AsRational a) ~=~ (AsRational b)
+
+instance TypesEq (r :: TRational) (Test b) where
+  type r ~=~ (Test b) = r ~=~ AsRational b

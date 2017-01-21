@@ -42,13 +42,13 @@ test-suite type-tests
 
   hs-source-dirs:      test
 
-  main-is:             TypeNum/TTest.hs
-  other-modules:       TypeNum.TTest.Common
+  main-is:             TypeNum/Test.hs
+  other-modules:       TypeNum.Test.Common
 
-                       TypeNum.TTest.Nat
-                       TypeNum.TTest.Int
-                       TypeNum.TTest.PosInt
-                       TypeNum.TTest.Rational
+                       TypeNum.Test.Nat
+                       TypeNum.Test.Int
+                       TypeNum.Test.PosInt
+                       TypeNum.Test.Rational
 
   default-language:    Haskell2010
   default-extensions:   TypeOperators
