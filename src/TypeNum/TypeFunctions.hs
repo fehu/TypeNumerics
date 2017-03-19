@@ -12,7 +12,7 @@
 --
 
 
-{-# LANGUAGE PolyKinds, ConstraintKinds, FunctionalDependencies #-}
+{-# LANGUAGE PolyKinds, ConstraintKinds #-}
 
 module TypeNum.TypeFunctions (
 
@@ -193,7 +193,7 @@ data EqFunc (arg :: (a,b)) (res :: Bool)
 type instance EqFunc :$: '(x,y) = x ~=~ y
 
 data EqualFunc (val :: a) (arg :: b) (res :: Bool)
-type instance (EqualFunc x) :$: y = x ~=~ y
+type instance EqualFunc x :$: y  =  x ~=~ y
 
 
 
