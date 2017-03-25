@@ -41,7 +41,7 @@ module TypeNum.TypeFunctions (
 , Fold, FoldWhile
 
 -- * List functions
-, Concat, Zip
+, Concat, type (++), Zip
 
 , All, Any
 , Contains
@@ -220,6 +220,7 @@ type family Concat (l1 :: [a]) (l2 :: [a]) :: [a] where
     Concat '[] l2      = l2
     Concat (h ': t) l2 = h ': Concat t l2
 
+type xs ++ ys = Concat xs ys
 
 type family All cond (l :: [a]) :: Bool where
     All cond '[]      = True
