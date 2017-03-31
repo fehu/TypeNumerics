@@ -31,14 +31,15 @@ module TypeNum (
 
 --, Convertible(..)
 
-, TypesEq(..), type (=~=), type  (/~=), TypesOrd (..)
+, TypesEq(..), type (=~=), type  (/~=), type (==)
+, TypesOrd (..), type (<), type (>), type (<=), type (>=)
 
 --, module TypeNum.TypeFunctions
 
 ) where
 
 import Data.Type.Bool
-import Data.Type.Equality
+import Data.Type.Equality (type (==))
 
 import TypeNum.TypeFunctions
 

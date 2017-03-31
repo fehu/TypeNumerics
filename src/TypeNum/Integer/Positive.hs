@@ -140,6 +140,3 @@ type family PosPlus a b where
 
 
 --instance Convertible (x :: PosInt) (y :: TInt) where type Convert x = Positive2Int x
-
-
-

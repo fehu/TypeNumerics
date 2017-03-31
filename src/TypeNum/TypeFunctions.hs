@@ -16,42 +16,45 @@
 
 module TypeNum.TypeFunctions (
 
-  TypesEq(..), type (=~=), type  (/~=)
-, TypesOrd(..)
+-- * Types equality
+  TypesEq(..) -- , type (~=~)
+, type (=~=), type (/~=)
 
-, Max, Min
+-- * Types ordering
+, TypesOrd(..) -- , Cmp
+, type (<), type (>), type (<=), type (>=)
+, Min, Max
 
--- Apply type-level function
-, (:$:)
+-- * Pairs deconstruction
+, Fst, Snd, ZipPairs
 
--- * Curry operations
-
-, Curry , Uncurry
-
--- * Tuple deconstruction
-, Fst, Snd
+-- * Maybe
+, FromMaybe
 
 -- * Arrow-like tuple operations
 , First, Second
 
 -- * Different tuple operations
-, ZipPairs, Firsts, Seconds
+, Firsts, Seconds
 
--- * Folds
-, Fold, FoldWhile
+-- * Containers
+, TContainerElem(..) -- Contains, All, Any, Prepend, Append, Rm
+, type (++), ContainsEach
 
--- * List functions
-, Concat, type (++), Zip
+, TContainers(..) -- , Concat, SameSize
 
-, All, Any
-, Contains
+, TContainerSameSize(..) -- , Zip
 
--- * Maybe functions
-, FromMaybe
+-- -- * Folds
+-- , Fold, FoldWhile
 
--- Some type functions
-, EqFunc, EqualFunc
-, CmpFunc
+-- * Functions
+, (:$:)
+, Curry, Uncurry
+
+-- * Some :$: functions
+, EqFunc, EqualFunc, CmpFunc
+, ContainsFunc
 
 ) where
 
@@ -82,16 +85,11 @@ class (TypesEq x y) =>
         -- | Types ordering.
         type Cmp  (x :: a) (y :: b) :: Ordering
 
-        type (<)  (x :: a) (y :: b) :: Bool
-        type (>)  (x :: a) (y :: b) :: Bool
-        type (<=) (x :: a) (y :: b) :: Bool
-        type (>=) (x :: a) (y :: b) :: Bool
 
-        type a < b = Cmp a b == LT
-        type a > b = Cmp a b == GT
-
-        type a <= b = a ~=~ b || a < b
-        type a >= b = a ~=~ b || a > b
+type family (x :: a) < (y :: b)  where a < b = Cmp a b == LT
+type family (x :: a) > (y :: b)  where a > b = Cmp a b == GT
+type family (x :: a) <= (y :: b) where a <= b = a ~=~ b || a < b
+type family (x :: a) >= (y :: b) where a >= b = a ~=~ b || a > b
 
 
 type Max (x :: a) (y :: b) = If (x >= y) x y
@@ -203,39 +201,101 @@ type instance CmpFunc :$: '(x,y) = Cmp x y
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
 
-type family Fold f r0 l where
-    Fold f res '[]      = res
-    Fold f res (h ': t) = Fold f (f :$: '(res, h)) t
+class TContainerElem (t :: k) (x :: e) where
+  type Contains x t :: Bool
+  type All (cond :: e -> Bool -> *) t :: Bool
+  type Any (cond :: e -> Bool -> *) t :: Bool
 
-type family FoldWhile cond f r0 l where
-    FoldWhile cond f res '[]      = res
-    FoldWhile cond f res (h ': t) = If (cond :$: h)
-                                       (FoldWhile cond f (f :$: (res, h)) t)
-                                       res
+  type Prepend x t :: k
+  type Append  t x :: k
+  type Rm      x t :: k
 
------------------------------------------------------------------------------
------------------------------------------------------------------------------
+class TContainers (t1 :: k) (t2 :: k) where
+  type Concat   t1 t2 :: k
+  type SameSize t1 t2 :: Bool
 
-type family Concat (l1 :: [a]) (l2 :: [a]) :: [a] where
-    Concat '[] l2      = l2
-    Concat (h ': t) l2 = h ': Concat t l2
+-- class (SameSize t1 t2 ~ True) =>
+--   TContainerSameSize (t1 :: k) (t2 :: k) where
+--     type Zip t1 t2 :: k
+
+class (SameSize t1 t2 ~ True) =>
+  TContainerSameSize (t1 :: k) (t2 :: k) (res :: k') where
+    type Zip t1 t2 :: k'
+
+
+data ContainsFunc  (t :: k) (x :: e) (res :: Bool)
+type instance ContainsFunc t :$: x = Contains x t
+
+type ContainsEach (t :: k) (xs :: k) = All (ContainsFunc t) xs
 
 type xs ++ ys = Concat xs ys
 
-type family All cond (l :: [a]) :: Bool where
-    All cond '[]      = True
-    All cond (h ': t) = cond :$: h && All cond t
+-----------------------------------------------------------------------------
 
-type family Any cond (l :: [a]) :: Bool where
-    Any cond '[]      = False
-    Any cond (h ': t) = cond :$: h || Any cond t
+class FoldableT (t :: k) (x :: e) (x0 :: r) where
+  type Fold (f :: (r, e) -> r -> *) x0 t :: r
+  type FoldWhile (cond :: e -> Bool -> *) (f :: (r, e) -> r -> *) x0 t :: r
+
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+
+instance TContainerElem ('[] :: [a]) (x :: a) where
+  type Contains x '[] = False
+  type All cond   '[] = True
+  type Any cond   '[] = False
+  type Prepend x '[]  = '[x]
+  type Append  '[] x  = '[x]
+  type Rm      x '[]  = '[]
+
+instance TContainerElem ((h ': t) :: [a]) (x :: a) where
+  type Contains x (h ': t) = h == x || Contains x t
+  type All cond   (h ': t) = (cond :$: h) && All cond t
+  type Any cond   (h ': t) = (cond :$: h) || Any cond t
+  type Prepend x (h ': t)   = x ': h ': t
+  type Append    (h ': t) x = h ': Append t x
+  type Rm      x (h ': t)   = If (h == x) (Rm x t) (h ': Rm x t)
+
+-----------------------------------------------------------------------------
+
+instance TContainers ('[] :: [a]) ('[] :: [a]) where
+  type Concat   '[] '[] = '[]
+  type SameSize '[] '[] = True
+
+instance TContainers ('[] :: [a]) ((h ': t) :: [a]) where
+  type Concat   '[] (h ': t) = (h ': t)
+  type SameSize '[] (h ': t) = False
+
+instance TContainers ((h ': t) :: [a]) ('[] :: [a]) where
+  type Concat   (h ': t) '[] = (h ': t)
+  type SameSize (h ': t) '[] = False
+
+instance TContainers ((h1 ': t1) :: [a]) ((h2 ': t2) :: [a]) where
+  type Concat   (h1 ': t1) (h2 ': t2) = h1 ': Concat t1 (h2 ': t2)
+  type SameSize (h1 ': t1) (h2 ': t2) = SameSize t1 t2
+
+-----------------------------------------------------------------------------
+
+instance TContainerSameSize ('[] :: [a]) ('[] :: [a]) ('[] :: [(a,a)]) where
+  type Zip '[] '[] = '[]
+
+instance (SameSize t1 t2 ~ True) => TContainerSameSize ((h1 ': t1) :: [a])
+                                                       ((h2 ': t2) :: [a])
+                                                       (res :: [(a,a)])
+  where
+    type Zip (h1 ': t1) (h2 ': t2) =  '(h1, h2) ': Zip t1 t2
+
+-----------------------------------------------------------------------------
+
+instance FoldableT ('[] :: [a]) (x :: a) x0 where
+  type Fold           f x0 '[] = x0
+  type FoldWhile cond f x0 '[] = x0
 
 
-type family Zip (l1 :: [a]) (l2 :: [b]) :: [(a,b)] where
-    Zip (h1 ': t1) (h2 ': t2) = '(h1,h2) ': Zip t1 t2
-
-
-type Contains (l :: [a]) (x :: a) = Any (EqualFunc x) l
+instance FoldableT ((h ': t) :: [a]) (x :: a) x0 where
+  type Fold           f x0 (x ': xs) = Fold f (f :$: '(x0, x)) xs
+  type FoldWhile cond f x0 (x ': xs) = If (cond :$: x)
+                                          (FoldWhile cond f (f :$: '(x0, x)) xs)
+                                          x0
 
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------

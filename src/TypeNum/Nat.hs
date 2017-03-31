@@ -19,11 +19,10 @@ module TypeNum.Nat (
 
 , NatSucc, NatPrev
 
-, TypesEq(..), type (=~=), type  (/~=), TypesOrd(..)
+, TypesEq(..), type (=~=), type  (/~=), type (==), TypesOrd(..)
 
 , TypeNat(..)
 
-, module Data.Type.Equality
 
 ) where
 
@@ -33,7 +32,7 @@ import GHC.TypeLits (Nat, CmpNat)
 import qualified GHC.TypeLits as TL
 
 import Data.Type.Bool
-import Data.Type.Equality
+import Data.Type.Equality (type (==))
 
 
 -----------------------------------------------------------------------------

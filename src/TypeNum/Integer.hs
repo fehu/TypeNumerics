@@ -35,8 +35,7 @@ import TypeNum
 import TypeNum.Nat
 
 import Data.Type.Bool
-import Data.Type.Equality hiding (type (==))
-import Data.Type.Equality
+import Data.Type.Equality (type (==))
 
 --import GHC.TypeLits (ErrorMessage) TODO: update GHC
 
@@ -237,6 +236,3 @@ instance TypeIntegral (a :: TInt) b where
     type DivMod  a b = WithSign' a b (DivMod  (AbsNat a) (AbsNat b))
 
 -----------------------------------------------------------------------------
-
-
-
