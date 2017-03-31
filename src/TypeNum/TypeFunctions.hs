@@ -17,7 +17,7 @@
 module TypeNum.TypeFunctions (
 
 -- * Types equality
-  TypesEq(..) -- , type (~=~)
+  TypesEq(..) , type (==)
 , type (=~=), type (/~=)
 
 -- * Types ordering
